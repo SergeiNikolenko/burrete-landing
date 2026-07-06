@@ -8,10 +8,10 @@
 <body>
 <x-dc>
 <helmet>
-<title>Burrete — the molecular file workspace for macOS</title>
-<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app: interactive Mol* 3D, RDKit grids, trajectories, sketching, and publication-ready xyzrender artwork.">
-<meta property="og:title" content="Burrete — molecular file workspace for macOS">
-<meta property="og:description" content="Press Space in Finder and see any structure. Mol* 3D, RDKit grids, trajectories and xyzrender — the small daily loop of computational chemistry.">
+<title>Burrete | Quick Look for molecular files</title>
+<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app: Mol* 3D, RDKit grids, trajectories, sketching, and xyzrender artwork.">
+<meta property="og:title" content="Burrete | Quick Look for molecular files">
+<meta property="og:description" content="Press Space on PDB, CIF, SDF, XYZ, trajectories, and chemistry tables. Open Burrete when you need tabs, grids, sketching, or export.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/burrete-quicklook.png">
 <meta name="theme-color" content="#0a0a0a">
@@ -150,6 +150,11 @@
   /* engine/source links */
   .src-link { text-decoration: none; transition: transform .35s cubic-bezier(.22,.61,.36,1), border-color .3s ease; }
   .src-link:hover { transform: translateY(-4px); border-color: var(--accent) !important; }
+  @media (hover: none), (pointer: coarse) {
+    .btn-ghost:hover, .fmt-chip:hover, .mq-chip:hover, .doc-card:hover, .src-link:hover, .hero-shot:hover { transform: none !important; }
+    .tilt:hover { box-shadow: none !important; }
+    .tilt:hover img, .tilt:hover video { transform: none !important; }
+  }
 
   /* lightbox */
   #lightbox { position: fixed; inset: 0; z-index: 10000; background: rgba(8,8,10,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 5vh 5vw; cursor: zoom-out; opacity: 0; transition: opacity .3s ease; }
@@ -214,15 +219,15 @@
   <div id="top" style="position: relative; overflow: hidden; background: var(--hero-grad); border-bottom: 1px solid var(--border);">
     <div class="hero-clouds" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div style="position: absolute; inset: 0; opacity: var(--grid-op); background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 40px 40px; animation: gridpan 6s linear infinite; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); pointer-events: none;"></div>
-    <canvas id="particles" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;"></canvas>
+    <canvas id="particles" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .45;"></canvas>
 
     <div class="hero-pad" style="position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 92px 32px 56px; text-align: center;">
       <div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono); margin-bottom: 26px; display: inline-flex; align-items: center; gap: 8px;">
         Open · Press Space · See
         <span style="display: inline-block; min-width: 58px; text-align: left; color: var(--accent);"><span id="rot-word">PDB</span></span>
       </div>
-      <h1 class="hero-title" style="font-size: clamp(38px, 6vw, 66px); line-height: 1.03; letter-spacing: -0.038em; font-weight: 700; margin: 0 auto; max-width: 840px; color: var(--text);"><span class="word" style="animation-delay:.02s">The</span> <span class="word" style="animation-delay:.09s">molecular</span> <span class="word" style="animation-delay:.16s">file</span> <span class="word" style="animation-delay:.23s">workspace</span> <span class="word" style="animation-delay:.3s">for</span> <span class="word" style="animation-delay:.37s">macOS.</span></h1>
-      <p style="font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: var(--body); max-width: 630px; margin: 26px auto 0;">Select a structure in Finder, press Space, and see it. Open Burrete for tabs, 3D previews, molecule grids, trajectories and sketching — the small daily loop of computational chemistry.</p>
+      <h1 class="hero-title" style="font-size: clamp(38px, 6vw, 66px); line-height: 1.03; letter-spacing: -0.038em; font-weight: 700; margin: 0 auto; max-width: 840px; color: var(--text);"><span class="word" style="animation-delay:.02s">Quick</span> <span class="word" style="animation-delay:.09s">Look</span> <span class="word" style="animation-delay:.16s">for</span> <span class="word" style="animation-delay:.23s">molecular</span> <span class="word" style="animation-delay:.3s">files</span> <span class="word" style="animation-delay:.37s">on macOS.</span></h1>
+      <p style="font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: var(--body); max-width: 630px; margin: 26px auto 0;">Press Space on PDB, CIF, SDF, XYZ, trajectories, or chemistry tables. Open Burrete when you need tabs, 3D inspection, RDKit grids, sketching, or export.</p>
       <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 38px;">
         <a class="btn-primary magnetic" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener" style="background: var(--invert-bg); color: var(--invert-fg); padding: 14px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 9px;"><span class="shine"></span>Download for macOS</a>
         <a class="btn-ghost" href="#install" style="display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--text); padding: 14px 20px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--nav);"><span style="color: var(--mono);">$</span> brew install --cask burrete</a>
@@ -241,7 +246,7 @@
       <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Supported files</span>
       <span class="pill beam"><span class="pdot"></span><span class="tick" data-to="20" data-suffix="+" style="color: var(--text); font-weight: 600;">0</span>&nbsp;formats · one keystroke</span>
     </div>
-    <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 32px; max-width: 620px; color: var(--text);">Every format you press Space on.</h2>
+    <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 32px; max-width: 620px; color: var(--text);">PDB, CIF, SDF, XYZ, and tables.</h2>
 
     <!-- scrolling extension marquee -->
     <div class="reveal" style="margin: 0 -32px 40px; padding: 0 0;">
@@ -300,8 +305,8 @@
     <div class="showcase reveal" style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; margin-bottom: 40px;">
       <div>
         <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Finder Quick Look · Mol* 3D</div>
-        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">See a structure the moment you press Space.</h3>
-        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Confirm what a file is in interactive 3D — chains, residues, ligands, surfaces — without launching a heavy modeling suite. The daily "what is this?" check, answered in a keystroke.</p>
+        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Inspect a structure before opening an app.</h3>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Finder previews open in interactive 3D: chains, residues, ligands, and surfaces are visible before you decide what to do with the file.</p>
       </div>
       <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
         <img class="img-light zoomable" src="assets/prev-light.png" loading="lazy" decoding="async" alt="Burrete Quick Look preview floating on the desktop" style="width: 100%; display: block;">
@@ -327,7 +332,7 @@
       <div>
         <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Mol* trajectories</div>
         <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Scrub multi-frame runs like video.</h3>
-        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Multi-frame XYZ and MD trajectories play back in place — Prev / Next / All and a frame counter drive the native Mol* trajectory controls, so a whole run reads like a short clip.</p>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Multi-frame XYZ and MD trajectories play back in place. Prev / Next / All and a frame counter drive the native Mol* trajectory controls, so a run reads like a short clip.</p>
       </div>
       <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
         <img class="img-light zoomable" src="assets/second-light.png" loading="lazy" decoding="async" alt="Mol* trajectory playback" style="width: 100%; display: block;">
@@ -340,10 +345,10 @@
       <div>
         <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Viewport selection</div>
         <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Lasso atoms right in the scene.</h3>
-        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Draw a lasso across the viewport to select and isolate residues and ligands directly in 3D — pick a binding pocket without hunting a sequence list. The selection carries into measurements, isolation and export.</p>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Draw a lasso across the viewport to select and isolate residues and ligands directly in 3D. Pick a binding pocket without hunting a sequence list. The selection carries into measurements, isolation, and export.</p>
       </div>
       <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
-        <video class="autoplay-loop" src="assets/lasso.mp4" autoplay muted loop playsinline preload="auto" style="width: 100%; display: block;"></video>
+        <video class="autoplay-loop" src="assets/lasso.mp4" autoplay muted loop playsinline preload="metadata" style="width: 100%; display: block;"></video>
       </div>
     </div>
 
@@ -356,8 +361,8 @@
         </div>
         <div style="padding: 20px 22px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 9px;">Tabbed workspace</div>
-          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Every file in its own tab</div>
-          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Compare structures, inputs and outputs side by side — each tab keeps its renderer state alive as you switch.</p>
+          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">One tab per file</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Compare structures, inputs, and outputs side by side. Tabs keep their renderer state as you switch.</p>
         </div>
       </div>
       <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
@@ -368,7 +373,7 @@
         <div style="padding: 20px 22px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 9px;">Text + preview</div>
           <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Logs and inputs beside the structure</div>
-          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Read scripts, configs and solver logs next to the molecule they describe — no context switch, no second app.</p>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Read scripts, configs, and solver logs next to the molecule they describe.</p>
         </div>
       </div>
       <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
@@ -396,7 +401,7 @@
       <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; justify-content: center; padding: 26px 24px;">
         <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 10px;">Sketch & command</div>
         <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Ketcher + ⌘P palette</div>
-        <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 14px;">Draw a molecule and send it to Mol*, xyzrender or a grid. Everything is a keystroke away in the command palette.</p>
+        <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 14px;">Draw a molecule, then send it to Mol*, xyzrender, or a grid from the command palette.</p>
         <div style="display: flex; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
           <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">Ketcher</span>
           <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">⌘P</span>
@@ -415,7 +420,7 @@
           <span class="pill beam"><span class="pdot"></span>macOS 12+ · Apple Silicon &amp; Intel</span>
         </div>
         <h2 style="font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 16px; color: var(--text);">Two lines with Homebrew.</h2>
-        <p style="font-size: 15px; color: var(--body); line-height: 1.65; max-width: 440px; margin: 0 0 24px;">Tap the cask, install, then open Burrete once so macOS registers the Quick Look extension. If previews don't appear, run <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text);">bunx burrete doctor</span>.</p>
+        <p style="font-size: 15px; color: var(--body); line-height: 1.65; max-width: 440px; margin: 0 0 24px;">Install the cask, then open Burrete once so macOS registers the Quick Look extension. If previews don't appear, run <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text);">bunx burrete doctor</span>.</p>
         <div style="display: flex; flex-wrap: wrap; gap: 9px;">
           <span class="pill"><span class="pdot"></span>Homebrew cask</span>
           <span class="pill">MIT License</span>
@@ -441,10 +446,10 @@
   <div id="docs" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 84px 32px; border-bottom: 1px solid var(--border);">
     <div class="reveal" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
       <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Docs</span>
-      <span class="pill beam"><span class="pdot"></span>Everything is on GitHub</span>
+      <span class="pill beam"><span class="pdot"></span>Source, releases, issues</span>
     </div>
     <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; max-width: 640px; color: var(--text);">Read it, run it, fix it.</h2>
-    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 40px;">Short, practical docs — install, register the Quick Look extension, learn the shortcuts, and a doctor command for when previews misbehave.</p>
+    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 40px;">Install notes, Quick Look registration, shortcuts, and the doctor command for broken previews.</p>
 
     <div class="docs-grid" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch;">
       <!-- doc links -->
@@ -495,8 +500,8 @@
   <!-- ============ SOURCES & THANKS ============ -->
   <div class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 72px 32px;">
     <div class="reveal" style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono); margin-bottom: 14px;">Sources &amp; thanks</div>
-    <h2 class="reveal" style="font-size: clamp(24px, 3.2vw, 34px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; color: var(--text);">Built on great open source.</h2>
-    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 34px;">Burrete is a thin, careful wrapper around tools the community already trusts. Huge thanks to the people behind them.</p>
+    <h2 class="reveal" style="font-size: clamp(24px, 3.2vw, 34px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; color: var(--text);">Open-source engines, wired into Finder.</h2>
+    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 34px;">Burrete keeps the viewer small and lets Mol*, RDKit, xyzrender, and Ketcher do the specialist work.</p>
     <div class="src-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
       <a class="src-link reveal" href="https://molstar.org" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
         <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--accent);"></span>
