@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<title>Burrete — the molecular file workspace for macOS</title>
+<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app: interactive Mol* 3D, RDKit grids, trajectories, sketching, and publication-ready xyzrender artwork.">
+<meta property="og:title" content="Burrete — molecular file workspace for macOS">
+<meta property="og:description" content="Press Space in Finder and see any structure. Mol* 3D, RDKit grids, trajectories and xyzrender — the small daily loop of computational chemistry.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/burrete-quicklook.png">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  :root {
+    --accent: #0f8f72;
+    --bg: #ffffff; --surface: #fbfbfa; --surface-2: #f4f4f2;
+    --border: #ededeb; --border-2: #e4e4e2;
+    --text: #0a0a0a; --body: #52524e; --muted: #7a7a76; --mono: #8a8a86; --nav: #3a3a38;
+    --hero-grad: linear-gradient(180deg, #ffffff, #fbfbfa);
+    --grid-op: 0; --shadow-card: 0 30px 60px -30px rgba(0,0,0,.32);
+    --nav-bg: rgba(255,255,255,.72); --nav-border: #ededeb;
+    --invert-bg: #0a0a0a; --invert-fg: #ffffff;
+    --particle: rgba(15,143,114,.4); --particle-line: rgba(0,0,0,.05);
+    --cloud-a: rgba(124,131,246,.34); --cloud-b: rgba(74,164,236,.28); --cloud-c: color-mix(in srgb, var(--accent) 22%, transparent); --cloud-op: .95; --mol-bond: #14161c;
+  }
+  html[data-theme="dark"] {
+    --bg: #09090b; --surface: #0d0d10; --surface-2: #0b0b0e;
+    --border: #1e1e22; --border-2: #26262b;
+    --text: #ededed; --body: #9a9a97; --muted: #8a8a8e; --mono: #6a6a6e; --nav: #b4b4b0;
+    --hero-grad: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(255,255,255,0.06), transparent 70%), linear-gradient(#0a0a0c, #09090b);
+    --grid-op: 1; --shadow-card: 0 30px 60px -30px rgba(0,0,0,.7);
+    --nav-bg: rgba(10,10,12,.72); --nav-border: #1a1a1e;
+    --invert-bg: #fafafa; --invert-fg: #0a0a0a;
+    --particle: rgba(22,185,138,.55); --particle-line: rgba(255,255,255,.06);
+    --cloud-a: rgba(99,102,241,.42); --cloud-b: rgba(46,120,230,.34); --cloud-c: color-mix(in srgb, var(--accent) 32%, transparent); --cloud-op: .8; --mol-bond: #e8e8ea;
+  }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--text); transition: background .5s ease, color .5s ease; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+  ::view-transition-new(root) { z-index: 9999; }
+  ::view-transition-old(root) { z-index: 1; }
+  a { color: inherit; }
+  ::selection { background: var(--accent); color: #fff; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+  @keyframes gridpan { to { background-position: 40px 40px; } }
+  .hero-clouds { position: absolute; inset: -20% -10%; pointer-events: none; z-index: 0; opacity: var(--cloud-op); filter: blur(52px) saturate(1.15); }
+  .hero-clouds .blob { position: absolute; border-radius: 50%; mix-blend-mode: normal; will-change: transform; }
+  .hero-clouds .b1 { width: 46%; height: 60%; left: 4%;  top: -8%;  background: radial-gradient(circle at 40% 40%, var(--cloud-a), transparent 68%); animation: cloudDrift 26s ease-in-out infinite; }
+  .hero-clouds .b2 { width: 52%; height: 66%; right: -2%; top: 2%;   background: radial-gradient(circle at 55% 45%, var(--cloud-b), transparent 68%); animation: cloudDrift 32s ease-in-out infinite reverse; }
+  .hero-clouds .b3 { width: 40%; height: 52%; left: 30%; top: 24%;  background: radial-gradient(circle at 50% 50%, var(--cloud-c), transparent 66%); animation: cloudDrift2 38s ease-in-out infinite; }
+  @keyframes cloudDrift  { 0%,100% { transform: translate3d(0,0,0) scale(1); } 33% { transform: translate3d(6%,4%,0) scale(1.08); } 66% { transform: translate3d(-5%,-3%,0) scale(.96); } }
+  @keyframes cloudDrift2 { 0%,100% { transform: translate3d(0,0,0) scale(1.05); } 50% { transform: translate3d(4%,-5%,0) scale(.95); } }
+  @media (prefers-reduced-motion: reduce) { .hero-clouds .blob { animation: none !important; } }
+  .codex-panel { background: radial-gradient(circle at 18% 12%, var(--cloud-a), transparent 58%), radial-gradient(circle at 86% 86%, var(--cloud-b), transparent 60%), var(--surface-2) !important; padding: clamp(22px, 3vw, 40px) !important; display: flex; align-items: center; }
+  .codex-panel img, .codex-panel video { border-radius: 11px; box-shadow: 0 26px 50px -24px rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.22); }
+  @keyframes rise { from { opacity: 0; transform: translateY(22px); filter: blur(8px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes wordrise { from { opacity: 0; transform: translateY(24px); filter: blur(10px); } to { opacity: 1; transform: none; filter: blur(0); } }
+  @keyframes blink { 0%,49% { opacity: 1; } 50%,100% { opacity: 0; } }
+  @keyframes rotword { 0%,8% { opacity: 0; transform: translateY(8px); } 16%,84% { opacity: 1; transform: none; } 92%,100% { opacity: 0; transform: translateY(-8px); } }
+
+  .word { display: inline-block; animation: wordrise .7s cubic-bezier(.22,.61,.36,1) both; }
+
+  /* reveal on scroll */
+  .reveal { opacity: 0; }
+  .reveal.in { animation: rise .8s cubic-bezier(.22,.61,.36,1) both; }
+  @media (prefers-reduced-motion: reduce) {
+    .word, .reveal, .reveal.in { animation: none !important; opacity: 1 !important; filter: none !important; transform: none !important; }
+  }
+
+  /* nav */
+  .nav-link { position: relative; text-decoration: none; cursor: pointer; }
+  .nav-link::after { content: ''; position: absolute; left: 0; bottom: -5px; height: 1.5px; width: 100%; background: currentColor; transform: scaleX(0); transform-origin: left; transition: transform .35s cubic-bezier(.22,.61,.36,1); }
+  .nav-link:hover::after { transform: scaleX(1); }
+
+  /* buttons */
+  .btn-primary { cursor: pointer; text-decoration: none; transition: box-shadow .3s ease, transform .25s cubic-bezier(.34,1.56,.64,1); position: relative; overflow: hidden; }
+  .btn-primary:hover { box-shadow: 0 16px 34px -14px rgba(0,0,0,.55); }
+  .btn-primary:active { transform: scale(.97); }
+  .btn-primary .shine { position: absolute; top: 0; left: -120%; width: 60%; height: 100%; background: linear-gradient(100deg, transparent, rgba(255,255,255,.35), transparent); transform: skewX(-18deg); }
+  .btn-primary:hover .shine { animation: shinerun .85s ease; }
+  @keyframes shinerun { to { left: 140%; } }
+  .btn-ghost { cursor: pointer; text-decoration: none; transition: transform .25s cubic-bezier(.34,1.56,.64,1), border-color .25s ease; }
+  .btn-ghost:hover { transform: translateY(-2px); border-color: var(--accent) !important; }
+
+  /* format chips */
+  .fmt-chip { transition: transform .3s cubic-bezier(.34,1.56,.64,1), border-color .25s ease, color .25s ease; cursor: default; }
+  .fmt-chip:hover { transform: translateY(-3px); border-color: var(--accent) !important; color: var(--accent) !important; }
+
+  /* ── magic-ui inspired primitives ── */
+  /* border beam */
+  @property --beamang { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+  .beam { position: relative; z-index: 0; }
+  .beam::before { content: ""; position: absolute; inset: 0; border-radius: inherit; padding: 1.3px; background: conic-gradient(from var(--beamang), transparent 0 66%, var(--accent) 82%, #fff 90%, transparent 100%); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; animation: beamang 4.6s linear infinite; pointer-events: none; }
+  @keyframes beamang { to { --beamang: 360deg; } }
+  /* marquee */
+  .marquee { display: flex; overflow: hidden; -webkit-mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); mask: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent); }
+  .marquee__track { display: flex; gap: 12px; padding-right: 12px; flex-shrink: 0; min-width: 100%; animation: marquee 34s linear infinite; }
+  .marquee.rev .marquee__track { animation-direction: reverse; }
+  .marquee:hover .marquee__track { animation-play-state: paused; }
+  @keyframes marquee { to { transform: translateX(-100%); } }
+  .mq-chip { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--nav); border: 1px solid var(--border-2); border-radius: 8px; padding: 9px 14px; background: var(--surface); transition: color .25s ease, border-color .25s ease, transform .25s ease; }
+  .mq-chip:hover { color: var(--accent); border-color: var(--accent); transform: translateY(-2px); }
+  .mq-chip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); opacity: .7; }
+  /* spotlight */
+  .spot { position: relative; overflow: hidden; }
+  .spot::before { content: ""; position: absolute; inset: 0; border-radius: inherit; opacity: 0; transition: opacity .35s ease; background: radial-gradient(300px circle at var(--mx, 50%) var(--my, 50%), color-mix(in srgb, var(--accent) 15%, transparent), transparent 62%); pointer-events: none; }
+  .spot:hover::before { opacity: 1; }
+  /* pill badge */
+  .pill { display: inline-flex; align-items: center; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: .02em; color: var(--nav); border: 1px solid var(--border-2); border-radius: 999px; padding: 7px 14px; background: var(--surface); }
+  .pill .pdot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 22%, transparent); }
+  /* docs cards */
+  .doc-card { text-decoration: none; transition: transform .35s cubic-bezier(.22,.61,.36,1), border-color .3s ease; }
+  .doc-card:hover { transform: translateY(-4px); border-color: var(--accent) !important; }
+  .doc-card:hover .doc-arrow { transform: translate(3px, -3px); }
+  .doc-arrow { display: inline-block; transition: transform .3s cubic-bezier(.34,1.56,.64,1); }
+  /* kbd */
+  .kbd { font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--text); border: 1px solid var(--border-2); border-bottom-width: 2px; border-radius: 6px; padding: 3px 8px; background: var(--surface); }
+  @media (prefers-reduced-motion: reduce) {
+    .beam::before, .marquee__track { animation: none !important; }
+  }
+
+  /* tilt cards */
+  .tilt { transition: transform .4s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease, border-color .3s ease; transform-style: preserve-3d; will-change: transform; }
+  .tilt:hover { box-shadow: var(--shadow-card); }
+  .tilt img, .tilt video { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
+  .tilt:hover img, .tilt:hover video { transform: scale(1.05); }
+
+  /* zoomable */
+  .zoomable { cursor: zoom-in; }
+  .hero-shot { transition: transform .6s cubic-bezier(.22,.61,.36,1), box-shadow .6s ease; }
+  .hero-shot:hover { transform: translateY(-6px) scale(1.006); }
+
+  /* theme image swap */
+  html[data-theme="dark"] .img-light { display: none !important; }
+  html:not([data-theme="dark"]) .img-dark { display: none !important; }
+
+  /* hero title gradient in dark */
+  html[data-theme="dark"] .hero-title { background: linear-gradient(180deg, #ffffff, #b8b8b4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  /* engine/source links */
+  .src-link { text-decoration: none; transition: transform .35s cubic-bezier(.22,.61,.36,1), border-color .3s ease; }
+  .src-link:hover { transform: translateY(-4px); border-color: var(--accent) !important; }
+
+  /* lightbox */
+  #lightbox { position: fixed; inset: 0; z-index: 10000; background: rgba(8,8,10,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 5vh 5vw; cursor: zoom-out; opacity: 0; transition: opacity .3s ease; }
+  #lightbox.open { display: flex; opacity: 1; }
+  #lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 40px 120px -30px rgba(0,0,0,.9); animation: rise .4s cubic-bezier(.22,.61,.36,1) both; }
+
+  /* tweaks: motion */
+  html[data-motion="calm"] .tilt:hover img, html[data-motion="calm"] .tilt:hover video { transform: scale(1.02); }
+  html[data-motion="calm"] .reveal.in, html[data-motion="calm"] .word { animation-duration: 1.1s; }
+  html[data-motion="lively"] .reveal.in, html[data-motion="lively"] .word { animation-duration: .5s; animation-timing-function: cubic-bezier(.34,1.56,.64,1); }
+  html[data-motion="lively"] .tilt:hover img, html[data-motion="lively"] .tilt:hover video { transform: scale(1.08); }
+  html[data-motion="lively"] .fmt-chip:hover { transform: translateY(-6px); }
+  /* tweaks: corners */
+  html[data-corners="sharp"] .tilt, html[data-corners="sharp"] .src-link, html[data-corners="sharp"] .hero-shot { border-radius: 5px !important; }
+  html[data-corners="sharp"] .btn-primary, html[data-corners="sharp"] .btn-ghost, html[data-corners="sharp"] .fmt-chip { border-radius: 2px !important; }
+
+  /* responsive */
+  @media (max-width: 1080px) {
+    .feat-grid { grid-template-columns: repeat(2, 1fr) !important; }
+    .showcase { grid-template-columns: 1fr !important; }
+    .showcase .showcase-media { order: -1; }
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none !important; }
+    .feat-grid { grid-template-columns: 1fr !important; }
+    .install-grid { grid-template-columns: 1fr !important; }
+    .fmt-grid { grid-template-columns: 1fr !important; }
+    .src-grid { grid-template-columns: 1fr 1fr !important; }
+    .hero-pad { padding-left: 22px !important; padding-right: 22px !important; }
+    .sec-pad { padding-left: 22px !important; padding-right: 22px !important; }
+  }
+</style>
+<script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
+</helmet>
+
+<div id="lightbox"><img id="lightbox-img" alt=""></div>
+
+<div style="font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-width: 0;">
+
+  <!-- ============ NAV ============ -->
+  <div style="position: sticky; top: 0; z-index: 100; background: var(--nav-bg); -webkit-backdrop-filter: blur(20px) saturate(180%); backdrop-filter: blur(20px) saturate(180%); border-bottom: 1px solid var(--nav-border);">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 16px 32px;" class="hero-pad">
+      <a href="#top" style="display: flex; align-items: baseline; gap: 11px; text-decoration: none;">
+        <span style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em; color: var(--text);">Burrete</span>
+      </a>
+      <div class="nav-links" style="display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--nav);">
+        <a class="nav-link" href="#features">Features</a>
+        <a class="nav-link" href="#formats">Formats</a>
+        <a class="nav-link" href="#install">Install</a>
+        <a class="nav-link" href="#docs">Docs</a>
+      </div>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; transition: border-color .25s ease;">
+          <span style="display: block;">{{ themeGlyph }}</span>
+        </button>
+        <a class="btn-primary magnetic" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener" style="display: inline-flex; align-items: center; gap: 8px; background: var(--invert-bg); color: var(--invert-fg); padding: 10px 17px; border-radius: 9px; font-size: 14px; font-weight: 500;"><span class="shine"></span>Download</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ HERO ============ -->
+  <div id="top" style="position: relative; overflow: hidden; background: var(--hero-grad); border-bottom: 1px solid var(--border);">
+    <div class="hero-clouds" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
+    <div style="position: absolute; inset: 0; opacity: var(--grid-op); background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 40px 40px; animation: gridpan 6s linear infinite; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); pointer-events: none;"></div>
+    <canvas id="particles" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0;"></canvas>
+
+    <div class="hero-pad" style="position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 92px 32px 56px; text-align: center;">
+      <div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono); margin-bottom: 26px; display: inline-flex; align-items: center; gap: 8px;">
+        Open · Press Space · See
+        <span style="display: inline-block; min-width: 58px; text-align: left; color: var(--accent);"><span id="rot-word">PDB</span></span>
+      </div>
+      <h1 class="hero-title" style="font-size: clamp(38px, 6vw, 66px); line-height: 1.03; letter-spacing: -0.038em; font-weight: 700; margin: 0 auto; max-width: 840px; color: var(--text);"><span class="word" style="animation-delay:.02s">The</span> <span class="word" style="animation-delay:.09s">molecular</span> <span class="word" style="animation-delay:.16s">file</span> <span class="word" style="animation-delay:.23s">workspace</span> <span class="word" style="animation-delay:.3s">for</span> <span class="word" style="animation-delay:.37s">macOS.</span></h1>
+      <p style="font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: var(--body); max-width: 630px; margin: 26px auto 0;">Select a structure in Finder, press Space, and see it. Open Burrete for tabs, 3D previews, molecule grids, trajectories and sketching — the small daily loop of computational chemistry.</p>
+      <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 38px;">
+        <a class="btn-primary magnetic" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener" style="background: var(--invert-bg); color: var(--invert-fg); padding: 14px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 9px;"><span class="shine"></span>Download for macOS</a>
+        <a class="btn-ghost" href="#install" style="display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--text); padding: 14px 20px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--nav);"><span style="color: var(--mono);">$</span> brew install --cask burrete</a>
+      </div>
+
+      <div class="reveal hero-crop" style="margin: 56px auto 0; max-width: 1000px; border: 1px solid var(--border); border-bottom: none; border-radius: 14px 14px 0 0; overflow: hidden; box-shadow: var(--shadow-card); aspect-ratio: 1.9; -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent 100%); mask-image: linear-gradient(180deg, #000 82%, transparent 100%);">
+        <img class="hero-shot zoomable img-light" src="assets/main-light.png" alt="Burrete previewing 3HTB.pdb in the Mol* illustrative renderer" loading="eager" decoding="async" style="display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center;">
+        <img class="hero-shot zoomable img-dark" src="assets/main-dark.png" alt="Burrete previewing 3HTB.pdb in the Mol* illustrative renderer" loading="eager" decoding="async" style="display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center;">
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FORMATS ============ -->
+  <div id="formats" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 84px 32px; border-bottom: 1px solid var(--border);">
+    <div class="reveal" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+      <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Supported files</span>
+      <span class="pill beam"><span class="pdot"></span><span class="tick" data-to="20" data-suffix="+" style="color: var(--text); font-weight: 600;">0</span>&nbsp;formats · one keystroke</span>
+    </div>
+    <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 32px; max-width: 620px; color: var(--text);">Every format you press Space on.</h2>
+
+    <!-- scrolling extension marquee -->
+    <div class="reveal" style="margin: 0 -32px 40px; padding: 0 0;">
+      <div class="marquee">
+        <div class="marquee__track">
+          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.poscar</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
+          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.poscar</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="fmt-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+      <div class="reveal spot" style="border: 1px solid var(--border); border-radius: 14px; padding: 24px; background: var(--surface);">
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text);">Mol* interactive 3D</div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 18px;">Default path for most structures.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">PDB</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">CIF</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">MMCIF</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">SDF</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">MOL2</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">XYZ</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">GRO</span>
+        </div>
+      </div>
+      <div class="reveal spot" style="border: 1px solid var(--border); border-radius: 14px; padding: 24px; background: var(--surface);">
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text);">RDKit molecule grids</div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 18px;">Search, sort, SMARTS, export.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">SMILES</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">SMI</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">CSV</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">TSV</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">SD</span>
+        </div>
+      </div>
+      <div class="reveal spot" style="border: 1px solid var(--border); border-radius: 14px; padding: 24px; background: var(--surface);">
+        <div style="font-size: 16px; font-weight: 600; margin-bottom: 6px; color: var(--text);">External xyzrender</div>
+        <div style="font-size: 13px; color: var(--muted); margin-bottom: 18px;">SVG artwork for QM outputs.</div>
+        <div style="display: flex; flex-wrap: wrap; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">CUBE</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">LOG</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">OUT</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">PSI4</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">VASP</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">MAE</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ FEATURES ============ -->
+  <div id="features" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 88px 32px 40px;">
+    <div class="reveal" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+      <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Workspace</span>
+      <span class="pill beam"><span class="pdot"></span>Everything one keystroke away</span>
+    </div>
+    <h2 class="reveal" style="font-size: clamp(30px, 4.4vw, 46px); letter-spacing: -0.035em; font-weight: 700; margin: 0 0 14px; max-width: 720px; color: var(--text);">A compact utility, not another modeling suite.</h2>
+    <p class="reveal" style="font-size: clamp(16px, 2vw, 18px); color: var(--body); line-height: 1.6; max-width: 600px; margin: 0 0 40px;">Each surface is built around one real task in the structure-triage loop — open, confirm, compare, act.</p>
+
+    <!-- stats strip -->
+    <div class="stat-strip reveal" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--border); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin-bottom: 56px;">
+      <div class="spot" style="background: var(--surface); padding: 26px 24px;">
+        <div style="font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1;"><span class="tick" data-to="20" data-suffix="+">0</span></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 10px;">file formats</div>
+      </div>
+      <div class="spot" style="background: var(--surface); padding: 26px 24px;">
+        <div style="font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1;"><span class="tick" data-to="3">0</span></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 10px;">render engines</div>
+      </div>
+      <div class="spot" style="background: var(--surface); padding: 26px 24px;">
+        <div style="font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1;"><span class="tick" data-to="2">0</span></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 10px;">lines to install</div>
+      </div>
+      <div class="spot" style="background: var(--surface); padding: 26px 24px;">
+        <div style="font-size: clamp(30px, 4vw, 40px); font-weight: 700; letter-spacing: -0.03em; color: var(--text); line-height: 1;"><span class="tick" data-to="1">0</span></div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--muted); margin-top: 10px;">keystroke to preview</div>
+      </div>
+    </div>
+
+    <!-- showcase block 1 -->
+    <div class="showcase reveal" style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; margin-bottom: 40px;">
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Finder Quick Look · Mol* 3D</div>
+        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">See a structure the moment you press Space.</h3>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Confirm what a file is in interactive 3D — chains, residues, ligands, surfaces — without launching a heavy modeling suite. The daily "what is this?" check, answered in a keystroke.</p>
+      </div>
+      <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
+        <img class="img-light zoomable" src="assets/prev-light.png" loading="lazy" decoding="async" alt="Burrete Quick Look preview floating on the desktop" style="width: 100%; display: block;">
+        <img class="img-dark zoomable" src="assets/prev-dark.png" loading="lazy" decoding="async" alt="Burrete Quick Look preview floating on the desktop" style="width: 100%; display: block;">
+      </div>
+    </div>
+
+    <!-- showcase block 2 -->
+    <div class="showcase reveal" style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; margin-bottom: 40px;">
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">RDKit collections</div>
+        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Triage whole libraries as a grid.</h3>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Open SDF, SMILES, CSV or TSV as a searchable grid: sort, SMARTS-filter and highlight, select, merge and export. Flip the render engine from RDKit to xyzrender for publication-style cards across hundreds of molecules.</p>
+      </div>
+      <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
+        <img class="img-light zoomable" src="assets/grid-table-light.png" loading="lazy" decoding="async" alt="RDKit molecule grid" style="width: 100%; display: block;">
+        <img class="img-dark zoomable" src="assets/grid-table-dark.png" loading="lazy" decoding="async" alt="RDKit molecule grid" style="width: 100%; display: block;">
+      </div>
+    </div>
+
+    <!-- showcase block 3 -->
+    <div class="showcase reveal" style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; margin-bottom: 56px;">
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Mol* trajectories</div>
+        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Scrub multi-frame runs like video.</h3>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Multi-frame XYZ and MD trajectories play back in place — Prev / Next / All and a frame counter drive the native Mol* trajectory controls, so a whole run reads like a short clip.</p>
+      </div>
+      <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
+        <img class="img-light zoomable" src="assets/second-light.png" loading="lazy" decoding="async" alt="Mol* trajectory playback" style="width: 100%; display: block;">
+        <img class="img-dark zoomable" src="assets/second-dark.png" loading="lazy" decoding="async" alt="Mol* trajectory playback" style="width: 100%; display: block;">
+      </div>
+    </div>
+
+    <!-- showcase block 4 · video -->
+    <div class="showcase reveal" style="display: grid; grid-template-columns: 1fr 1.15fr; gap: 44px; align-items: center; margin-bottom: 56px;">
+      <div>
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">Viewport selection</div>
+        <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Lasso atoms right in the scene.</h3>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Draw a lasso across the viewport to select and isolate residues and ligands directly in 3D — pick a binding pocket without hunting a sequence list. The selection carries into measurements, isolation and export.</p>
+      </div>
+      <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
+        <video class="autoplay-loop" src="assets/lasso.mp4" autoplay muted loop playsinline preload="auto" style="width: 100%; display: block;"></video>
+      </div>
+    </div>
+
+    <!-- smaller grid -->
+    <div class="feat-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;">
+      <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
+        <div style="border-bottom: 1px solid var(--border); background: var(--surface-2); overflow: hidden; aspect-ratio: 16/10;">
+          <img class="img-light zoomable" src="assets/multi-light.png" loading="lazy" decoding="async" alt="Tabbed workspace" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+          <img class="img-dark zoomable" src="assets/multi-dark.png" loading="lazy" decoding="async" alt="Tabbed workspace" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+        </div>
+        <div style="padding: 20px 22px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 9px;">Tabbed workspace</div>
+          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Every file in its own tab</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Compare structures, inputs and outputs side by side — each tab keeps its renderer state alive as you switch.</p>
+        </div>
+      </div>
+      <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
+        <div style="border-bottom: 1px solid var(--border); background: var(--surface-2); overflow: hidden; aspect-ratio: 16/10;">
+          <img class="img-light zoomable" src="assets/text-pic-light.png" loading="lazy" decoding="async" alt="Text and preview" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+          <img class="img-dark zoomable" src="assets/text-pic-dark.png" loading="lazy" decoding="async" alt="Text and preview" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+        </div>
+        <div style="padding: 20px 22px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 9px;">Text + preview</div>
+          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Logs and inputs beside the structure</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Read scripts, configs and solver logs next to the molecule they describe — no context switch, no second app.</p>
+        </div>
+      </div>
+      <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
+        <div style="border-bottom: 1px solid var(--border); background: var(--surface-2); overflow: hidden; aspect-ratio: 16/10;">
+          <img class="img-light zoomable" src="assets/xyzr-light.png" loading="lazy" decoding="async" alt="xyzrender single" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+          <img class="img-dark zoomable" src="assets/xyzr-dark.png" loading="lazy" decoding="async" alt="xyzrender single" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+        </div>
+        <div style="padding: 20px 22px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">xyzrender · single</div>
+          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Publication-ready SVG artwork</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Render single-frame XYZ and QM outputs (CUBE, LOG, PSI4, VASP…) as clean, depth-cued vector figures for slides and papers.</p>
+        </div>
+      </div>
+      <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column;">
+        <div style="border-bottom: 1px solid var(--border); background: var(--surface-2); overflow: hidden; aspect-ratio: 16/10;">
+          <img class="img-light zoomable" src="assets/xyzr-grid-light.png" loading="lazy" decoding="async" alt="xyzrender grid" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+          <img class="img-dark zoomable" src="assets/xyzr-grid-dark.png" loading="lazy" decoding="async" alt="xyzrender grid" style="width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block;">
+        </div>
+        <div style="padding: 20px 22px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">xyzrender · grid</div>
+          <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">A whole collection as SVG cards</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0;">Batch-render an entire library through xyzrender for consistent, publication-style cards you can drop straight into a figure.</p>
+        </div>
+      </div>
+      <div class="tilt reveal" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: flex; flex-direction: column; justify-content: center; padding: 26px 24px;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--mono); margin-bottom: 10px;">Sketch & command</div>
+        <div style="font-size: 17px; font-weight: 600; color: var(--text); margin-bottom: 7px;">Ketcher + ⌘P palette</div>
+        <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 14px;">Draw a molecule and send it to Mol*, xyzrender or a grid. Everything is a keystroke away in the command palette.</p>
+        <div style="display: flex; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">Ketcher</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">⌘P</span>
+          <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">iPhone app</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ INSTALL ============ -->
+  <div id="install" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 80px 32px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+    <div class="install-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center;">
+      <div class="reveal">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Install</span>
+          <span class="pill beam"><span class="pdot"></span>macOS 12+ · Apple Silicon &amp; Intel</span>
+        </div>
+        <h2 style="font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 16px; color: var(--text);">Two lines with Homebrew.</h2>
+        <p style="font-size: 15px; color: var(--body); line-height: 1.65; max-width: 440px; margin: 0 0 24px;">Tap the cask, install, then open Burrete once so macOS registers the Quick Look extension. If previews don't appear, run <span style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text);">bunx burrete doctor</span>.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 9px;">
+          <span class="pill"><span class="pdot"></span>Homebrew cask</span>
+          <span class="pill">MIT License</span>
+          <span class="pill">Notarized</span>
+          <span class="pill">~14 MB</span>
+        </div>
+      </div>
+      <div class="reveal" style="background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 14px; overflow: hidden; font-family: 'Geist Mono', monospace; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);">
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid #1e1e1e;">
+          <div style="display: flex; gap: 7px;">
+            <span style="width: 11px; height: 11px; border-radius: 50%; background: #e0605a;"></span>
+            <span style="width: 11px; height: 11px; border-radius: 50%; background: #e3b53f;"></span>
+            <span style="width: 11px; height: 11px; border-radius: 50%; background: #5ab552;"></span>
+          </div>
+          <button onClick="{{ copyBrew }}" style="cursor: pointer; background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: #cfcfcf; font-family: 'Geist Mono', monospace; font-size: 11px; padding: 4px 10px;">{{ brewLabel }}</button>
+        </div>
+        <div id="term-body" style="padding: 22px 18px; font-size: 13.5px; line-height: 2; color: #ededed; min-height: 148px;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ DOCS ============ -->
+  <div id="docs" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 84px 32px; border-bottom: 1px solid var(--border);">
+    <div class="reveal" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+      <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Docs</span>
+      <span class="pill beam"><span class="pdot"></span>Everything is on GitHub</span>
+    </div>
+    <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; max-width: 640px; color: var(--text);">Read it, run it, fix it.</h2>
+    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 40px;">Short, practical docs — install, register the Quick Look extension, learn the shortcuts, and a doctor command for when previews misbehave.</p>
+
+    <div class="docs-grid" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch;">
+      <!-- doc links -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">01</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Getting started</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install, first launch, and how Quick Look picks up the extension.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">README <span class="doc-arrow">↗</span></span>
+        </a>
+        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">02</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Formats &amp; engines</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Which extension routes to Mol*, RDKit grids or xyzrender.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Reference <span class="doc-arrow">↗</span></span>
+        </a>
+        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete/issues" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">03</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Troubleshooting</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Previews not showing? Run <span style="font-family: 'Geist Mono', monospace; color: var(--text);">burrete doctor</span> or open an issue.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Issues <span class="doc-arrow">↗</span></span>
+        </a>
+        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">04</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Changelog</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Release notes, builds and every tagged version.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Releases <span class="doc-arrow">↗</span></span>
+        </a>
+      </div>
+      <!-- shortcuts panel -->
+      <div class="reveal" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 26px 24px; display: flex; flex-direction: column;">
+        <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mono); margin-bottom: 16px;">Keyboard</div>
+        <div style="display: flex; flex-direction: column; gap: 13px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><span style="font-size: 14px; color: var(--body);">Quick Look preview</span><span class="kbd">Space</span></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><span style="font-size: 14px; color: var(--body);">Command palette</span><span class="kbd">⌘ P</span></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><span style="font-size: 14px; color: var(--body);">Next / previous frame</span><span class="kbd">← →</span></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><span style="font-size: 14px; color: var(--body);">Cycle tabs</span><span class="kbd">⌘ ⇥</span></div>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px;"><span style="font-size: 14px; color: var(--body);">Toggle theme</span><span class="kbd">⌘ ⇧ L</span></div>
+        </div>
+        <div style="margin-top: auto; padding-top: 20px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mono); margin-bottom: 10px;">Fix previews</div>
+          <div style="font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 8px; padding: 11px 13px;">$ bunx burrete doctor</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SOURCES & THANKS ============ -->
+  <div class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 72px 32px;">
+    <div class="reveal" style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono); margin-bottom: 14px;">Sources &amp; thanks</div>
+    <h2 class="reveal" style="font-size: clamp(24px, 3.2vw, 34px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; color: var(--text);">Built on great open source.</h2>
+    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 34px;">Burrete is a thin, careful wrapper around tools the community already trusts. Huge thanks to the people behind them.</p>
+    <div class="src-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+      <a class="src-link reveal" href="https://molstar.org" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--accent);"></span>
+        <span style="font-size: 16px; font-weight: 600; color: var(--text);">Mol*</span>
+        <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Interactive 3D structure viewer used across structural biology.</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">molstar.org ↗</span>
+      </a>
+      <a class="src-link reveal" href="https://github.com/aligfellow/xyzrender" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 10px; height: 10px; border-radius: 3px; background: #8a8f2a;"></span>
+        <span style="font-size: 16px; font-weight: 600; color: var(--text);">xyzrender</span>
+        <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Depth-cued SVG / PNG / PDF renderer for XYZ &amp; QM output.</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">aligfellow/xyzrender ↗</span>
+      </a>
+      <a class="src-link reveal" href="https://www.rdkit.org" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 10px; height: 10px; border-radius: 3px; background: #4f5bd5;"></span>
+        <span style="font-size: 16px; font-weight: 600; color: var(--text);">RDKit</span>
+        <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Cheminformatics toolkit behind the molecule grids.</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">rdkit.org ↗</span>
+      </a>
+      <a class="src-link reveal" href="https://github.com/epam/ketcher" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <span style="width: 10px; height: 10px; border-radius: 3px; background: #c9761e;"></span>
+        <span style="font-size: 16px; font-weight: 600; color: var(--text);">Ketcher</span>
+        <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">The 2D chemical structure editor used for sketching.</span>
+        <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">epam/ketcher ↗</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- ============ FOOTER ============ -->
+  <div class="sec-pad" style="border-top: 1px solid var(--border); background: var(--surface);">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--mono);">
+      <span style="font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.02em;">Burrete</span>
+      <div style="display: flex; gap: 22px; flex-wrap: wrap;">
+        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete" target="_blank" rel="noopener">GitHub</a>
+        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener">Releases</a>
+        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener">Docs</a>
+        <span>MIT License</span>
+        <span>macOS 12+</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;color&quot;,&quot;options&quot;:[&quot;#0f8f72&quot;,&quot;#0ea5b7&quot;,&quot;#4f5bd5&quot;,&quot;#c9761e&quot;],&quot;default&quot;:&quot;#0ea5b7&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Feel&quot;},&quot;motion&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Calm&quot;,&quot;Balanced&quot;,&quot;Lively&quot;],&quot;default&quot;:&quot;Balanced&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Feel&quot;},&quot;corners&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Soft&quot;,&quot;Sharp&quot;],&quot;default&quot;:&quot;Soft&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Feel&quot;}}">
+class Component extends DCLogic {
+  state = { copied: false, theme: "light" };
+
+  componentDidMount() {
+    let t = null;
+    try { t = localStorage.getItem("burrete-theme"); } catch (e) {}
+    if (!t) t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+    this.setTheme(t, false);
+    this.applyTweaks();
+    this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const safe = (fn) => { try { fn.call(this); } catch (e) { console.warn("init failed:", fn.name, e); } };
+    safe(this.initReveal);
+    safe(this.initRotating);
+    safe(this.initTyping);
+    safe(this.initTilt);
+    safe(this.initMagnetic);
+    safe(this.initZoom);
+    safe(this.initTickers);
+    safe(this.initSpotlight);
+    safe(this.initVideos);
+    safe(this.initParticles);
+  }
+
+  initTickers() {
+    const done = new Set();
+    const run = (el) => {
+      if (done.has(el)) return; done.add(el);
+      const to = parseFloat(el.getAttribute("data-to")) || 0;
+      const suf = el.getAttribute("data-suffix") || "";
+      if (this.reduced) { el.textContent = to + suf; return; }
+      const dur = 1100, t0 = performance.now();
+      const iv = setInterval(() => {
+        const p = Math.min(1, (performance.now() - t0) / dur);
+        const e = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(to * e) + suf;
+        if (p >= 1) clearInterval(iv);
+      }, 33);
+    };
+    // re-query each pass so tickers are found even if they stream in after mount
+    const poll = () => {
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      document.querySelectorAll(".tick").forEach(el => {
+        if (done.has(el)) return;
+        const r = el.getBoundingClientRect();
+        if (r.bottom > 0 && r.top < vh * 0.92) run(el);
+      });
+    };
+    poll();
+    this._tickPoll = setInterval(poll, 200);
+  }
+
+  initSpotlight() {
+    if (this.reduced) return;
+    document.querySelectorAll(".spot").forEach(el => {
+      el.addEventListener("pointermove", (e) => {
+        const r = el.getBoundingClientRect();
+        el.style.setProperty("--mx", ((e.clientX - r.left) / r.width * 100) + "%");
+        el.style.setProperty("--my", ((e.clientY - r.top) / r.height * 100) + "%");
+      });
+    });
+  }
+
+  initVideos() {
+    const vids = [...document.querySelectorAll("video")];
+    const kick = () => vids.forEach(v => {
+      v.muted = true; v.loop = true; v.playsInline = true;
+      const p = v.play();
+      if (p && p.catch) p.catch(() => {});
+    });
+    kick();
+    // retry a few times in case metadata/decode lags
+    let n = 0;
+    this._vidTimer = setInterval(() => { kick(); if (++n > 10) clearInterval(this._vidTimer); }, 500);
+    // resume whenever tab regains focus / becomes visible
+    this._onVis = () => { if (!document.hidden) kick(); };
+    document.addEventListener("visibilitychange", this._onVis);
+    window.addEventListener("focus", this._onVis);
+    // if a video ever ends or stalls, restart it
+    vids.forEach(v => {
+      v.addEventListener("ended", () => { v.currentTime = 0; v.play().catch(() => {}); });
+      v.addEventListener("pause", () => { if (!document.hidden) v.play().catch(() => {}); });
+    });
+  }
+  componentDidUpdate() { this.applyTweaks(); }
+
+  applyTweaks() {
+    const r = document.documentElement;
+    if (this.props.accent) r.style.setProperty("--accent", this.props.accent);
+    r.setAttribute("data-motion", (this.props.motion || "Balanced").toLowerCase());
+    r.setAttribute("data-corners", (this.props.corners || "Soft").toLowerCase());
+  }
+
+  setTheme(theme, persist) {
+    document.documentElement.setAttribute("data-theme", theme);
+    if (persist !== false) { try { localStorage.setItem("burrete-theme", theme); } catch (e) {} }
+    this.setState({ theme });
+    if (this._particleColors) this._particleColors();
+  }
+
+  toggleTheme = (e) => {
+    const next = this.state.theme === "dark" ? "light" : "dark";
+    const x = e && e.clientX != null ? e.clientX : window.innerWidth - 40;
+    const y = e && e.clientY != null ? e.clientY : 40;
+    if (!document.startViewTransition || this.reduced) { this.setTheme(next); return; }
+    const t = document.startViewTransition(() => this.setTheme(next));
+    t.ready.then(() => {
+      const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+      document.documentElement.animate(
+        { clipPath: ["circle(0px at " + x + "px " + y + "px)", "circle(" + r + "px at " + x + "px " + y + "px)"] },
+        { duration: 520, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" }
+      );
+    });
+  };
+
+  copy = () => {
+    const cmd = "brew tap SergeiNikolenko/burrete\nbrew install --cask burrete";
+    try { navigator.clipboard && navigator.clipboard.writeText(cmd); } catch (e) {}
+    this.setState({ copied: true });
+    clearTimeout(this._ct);
+    this._ct = setTimeout(() => this.setState({ copied: false }), 1500);
+  };
+
+  initReveal() {
+    const els = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window) || this.reduced) { els.forEach(e => { e.classList.add("in"); e.style.opacity = 1; }); return; }
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach(en => { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
+    els.forEach(e => io.observe(e));
+  }
+
+  initRotating() {
+    const el = document.getElementById("rot-word");
+    if (!el) return;
+    const words = ["PDB", "CIF", "SDF", "XYZ", "CUBE", "MOL2", "GRO"];
+    let i = 0;
+    el.style.display = "inline-block";
+    const tick = () => {
+      el.style.animation = "none"; void el.offsetWidth;
+      el.textContent = words[i];
+      el.style.animation = "rotword 2.6s ease both";
+      i = (i + 1) % words.length;
+    };
+    tick();
+    this._rotTimer = setInterval(tick, 2600);
+  }
+
+  initTyping() {
+    const body = document.getElementById("term-body");
+    if (!body) return;
+    const lines = [
+      { p: "$ ", t: "brew tap SergeiNikolenko/burrete" },
+      { p: "$ ", t: "brew install --cask burrete" },
+      { p: "", t: "# then open Burrete once to register Quick Look", muted: true }
+    ];
+    const render = (done, cur, curText) => {
+      let html = "";
+      for (let k = 0; k < done; k++) {
+        const L = lines[k];
+        html += '<div style="' + (L.muted ? "color:#5a5a56;" : "") + '"><span style="color:#5a5a56;">' + L.p + '</span>' + this.esc(L.t) + "</div>";
+      }
+      if (cur < lines.length) {
+        const L = lines[cur];
+        html += '<div style="' + (L.muted ? "color:#5a5a56;" : "") + '"><span style="color:#5a5a56;">' + L.p + '</span>' + this.esc(curText) + '<span style="display:inline-block;width:8px;background:#ededed;animation:blink 1s step-end infinite;">&nbsp;</span></div>';
+      }
+      body.innerHTML = html;
+    };
+    if (this.reduced) {
+      body.innerHTML = lines.map(L => '<div style="' + (L.muted ? "color:#5a5a56;" : "") + '"><span style="color:#5a5a56;">' + L.p + "</span>" + this.esc(L.t) + "</div>").join("");
+      return;
+    }
+    const run = () => {
+      let li = 0, ci = 0;
+      const step = () => {
+        if (li >= lines.length) { render(lines.length, lines.length, ""); return; }
+        const L = lines[li];
+        ci++;
+        render(li, li, L.t.slice(0, ci));
+        if (ci >= L.t.length) { li++; ci = 0; this._typeTimer = setTimeout(step, 380); }
+        else { this._typeTimer = setTimeout(step, 34); }
+      };
+      step();
+    };
+    render(0, 0, "");
+    if ("IntersectionObserver" in window) {
+      const io = new IntersectionObserver((ents) => {
+        ents.forEach(en => { if (en.isIntersecting) { io.disconnect(); run(); } });
+      }, { threshold: 0.4 });
+      io.observe(body);
+    } else { run(); }
+  }
+
+  esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  initTilt() {
+    if (this.reduced) return;
+    document.querySelectorAll(".tilt").forEach(card => {
+      card.addEventListener("mousemove", (e) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width - 0.5;
+        const py = (e.clientY - r.top) / r.height - 0.5;
+        const max = 5;
+        card.style.transform = "perspective(900px) rotateX(" + (-py * max) + "deg) rotateY(" + (px * max) + "deg) translateY(-4px)";
+      });
+      card.addEventListener("mouseleave", () => { card.style.transform = ""; });
+    });
+  }
+
+  initMagnetic() {
+    if (this.reduced) return;
+    document.querySelectorAll(".magnetic").forEach(el => {
+      const strength = 0.35;
+      el.addEventListener("mousemove", (e) => {
+        const r = el.getBoundingClientRect();
+        const mx = e.clientX - (r.left + r.width / 2);
+        const my = e.clientY - (r.top + r.height / 2);
+        el.style.transition = "transform .05s linear";
+        el.style.transform = "translate(" + mx * strength + "px," + my * strength + "px)";
+      });
+      el.addEventListener("mouseleave", () => {
+        el.style.transition = "transform .35s cubic-bezier(.34,1.56,.64,1)";
+        el.style.transform = "";
+      });
+    });
+  }
+
+  initZoom() {
+    const lb = document.getElementById("lightbox");
+    const img = document.getElementById("lightbox-img");
+    if (!lb || !img) return;
+    document.addEventListener("click", (e) => {
+      const z = e.target.closest && e.target.closest(".zoomable");
+      if (z && z.offsetParent !== null) {
+        img.src = z.currentSrc || z.src;
+        img.alt = z.alt || "";
+        lb.classList.add("open");
+      }
+    });
+    lb.addEventListener("click", () => lb.classList.remove("open"));
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") lb.classList.remove("open"); });
+  }
+
+  initParticles() {
+    const cv = document.getElementById("particles");
+    if (!cv || this.reduced) return;
+    const host = cv.parentElement;
+    const ctx = cv.getContext("2d");
+    let w, h, dpr, bondCol = "rgba(20,20,25,.18)", bg = "#fff", accent = "#0f8f72";
+
+    // --- RDKit-style 2D skeletal templates (unit coords, ~1.0 bond length) ---
+    // el: undefined => carbon (no label). bonds: [i, j, order]
+    const R3 = Math.sqrt(3) / 2;
+    const hex = [[1,0],[.5,R3],[-.5,R3],[-1,0],[-.5,-R3],[.5,-R3]];
+    const TEMPLATES = [
+      { // benzene
+        atoms: hex.map(p => ({ x: p[0], y: p[1] })),
+        bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]]
+      },
+      { // pyridine (N at 0)
+        atoms: hex.map((p,i) => ({ x: p[0], y: p[1], el: i === 0 ? "N" : undefined })),
+        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]]
+      },
+      { // cyclohexanol
+        atoms: [...hex.map(p => ({ x: p[0], y: p[1] })), { x: 1.9, y: 0, el: "O" }],
+        bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1],[0,6,1]]
+      },
+      { // amide  C-C(=O)-N
+        atoms: [{ x: -1, y: .35 }, { x: 0, y: 0 }, { x: 0, y: 1, el: "O" }, { x: .92, y: -.5, el: "N" }, { x: 1.9, y: -.1 }],
+        bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,1]]
+      },
+      { // naphthalene (fused bicyclic)
+        atoms: [
+          { x: 0, y: .5 }, { x: 0, y: -.5 }, { x: -R3*2, y: -1 }, { x: -R3*4, y: -.5 },
+          { x: -R3*4, y: .5 }, { x: -R3*2, y: 1 }, { x: R3*2, y: -1 }, { x: R3*4, y: -.5 },
+          { x: R3*4, y: .5 }, { x: R3*2, y: 1 }
+        ],
+        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2],[1,6,1],[6,7,2],[7,8,1],[8,9,2],[9,0,1]]
+      },
+      { // furan-ish 5-ring with O
+        atoms: [{ x: 0, y: 1, el: "O" }, { x: .95, y: .31 }, { x: .59, y: -.81 }, { x: -.59, y: -.81 }, { x: -.95, y: .31 }],
+        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,0,1]]
+      }
+    ];
+    const HETCOL = { O: "rgba(224,72,64,", N: "rgba(64,104,224,", S: "rgba(214,168,40," };
+
+    const readColors = () => {
+      const cs = getComputedStyle(document.documentElement);
+      accent = (cs.getPropertyValue("--accent").trim()) || accent;
+      bg = (cs.getPropertyValue("--bg").trim()) || bg;
+      const dark = document.documentElement.getAttribute("data-theme") === "dark";
+      bondCol = dark ? "rgba(210,214,220," : "rgba(24,26,32,";
+    };
+    this._particleColors = readColors;
+
+    const resize = () => {
+      const p = host.getBoundingClientRect();
+      if (!p.width || !p.height) { this._resizeRetry = setTimeout(resize, 120); return; } // layout not ready yet
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      w = p.width; h = p.height;
+      cv.width = w * dpr; cv.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize(); readColors();
+    // re-size whenever the hero lays out or changes size
+    if ("ResizeObserver" in window) {
+      this._ro = new ResizeObserver(() => resize());
+      this._ro.observe(host);
+    }
+
+    // spawn molecules
+    const SMILES = [
+      "CN1C=NC2=C1C(=O)N(C)C(=O)N2C",        // caffeine
+      "CC(=O)OC1=CC=CC=C1C(=O)O",            // aspirin
+      "CC(C)Cc1ccc(cc1)C(C)C(=O)O",          // ibuprofen
+      "OCC1OC(O)C(O)C(O)C1O",                // glucose
+      "NCCc1ccc(O)c(O)c1",                   // dopamine
+      "c1ccc2ccccc2c1",                      // naphthalene
+      "c1ccncc1",                            // pyridine
+      "c1ccccc1"                             // benzene
+    ];
+    const mols = [];
+    const UNIT = 30; // uniform molecule size
+    const COUNT = Math.max(14, Math.min(30, Math.round((w * h) / 90000)));
+    for (let i = 0; i < COUNT; i++) {
+      const t = TEMPLATES[(Math.random() * TEMPLATES.length) | 0];
+      mols.push({
+        t, smi: SMILES[(Math.random() * SMILES.length) | 0], spr: null,
+        x: Math.random() * w, y: Math.random() * h,
+        vx: (Math.random() - .5) * .06, vy: (Math.random() - .5) * .06,
+        a: Math.random() * 6.283, va: (Math.random() - .5) * .0012,
+        s: UNIT
+      });
+    }
+
+    // --- RDKit → molecular sprites (progressive; vector template is the fallback) ---
+    let RDKit = window.__rdkit || null;
+    const spriteCache = new Map();
+    let bondHex = "#14161c";
+    const readBondHex = () => {
+      const v = getComputedStyle(document.documentElement).getPropertyValue("--mol-bond").trim();
+      if (v) bondHex = v;
+    };
+    readBondHex();
+    const buildSprite = (smi) => {
+      if (!RDKit) return null;
+      const key = smi + "|" + bondHex;
+      if (spriteCache.has(key)) return spriteCache.get(key);
+      let mol; try { mol = RDKit.get_mol(smi); } catch (e) { return null; }
+      if (!mol) return null;
+      let svg;
+      try { svg = mol.get_svg(230, 230); } catch (e) { mol.delete(); return null; }
+      mol.delete();
+      svg = svg.replace(/<rect[^>]*\/>/g, "").replace(/<rect[^>]*>\s*<\/rect>/g, "");
+      svg = svg.replace(/#000000/gi, bondHex).replace(/stroke:\s*#000\b/gi, "stroke:" + bondHex);
+      const spr = { img: new Image(), ready: false };
+      spr.img.onload = () => { spr.ready = true; };
+      spr.img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+      spriteCache.set(key, spr);
+      return spr;
+    };
+    const rebuildSprites = () => { spriteCache.clear(); if (RDKit) mols.forEach(m => { m.spr = buildSprite(m.smi); }); };
+    // re-tint override: colors + sprites rebuilt on theme change
+    this._particleColors = () => { readColors(); readBondHex(); rebuildSprites(); };
+    const bootRDKit = () => {
+      if (RDKit) { rebuildSprites(); return; }
+      if (window.initRDKitModule) {
+        try { window.initRDKitModule().then(mod => { RDKit = mod; window.__rdkit = mod; readBondHex(); rebuildSprites(); }).catch(() => {}); } catch (e) {}
+      }
+    };
+    bootRDKit();
+    if (!RDKit) { let tries = 0; this._rdkitPoll = setInterval(() => { bootRDKit(); if (RDKit || ++tries > 40) clearInterval(this._rdkitPoll); }, 250); }
+
+    const mouse = { x: -1e4, y: -1e4, on: false };
+    host.addEventListener("pointermove", (e) => {
+      const r = host.getBoundingClientRect();
+      mouse.x = e.clientX - r.left; mouse.y = e.clientY - r.top; mouse.on = true;
+    });
+    host.addEventListener("pointerleave", () => { mouse.on = false; mouse.x = mouse.y = -1e4; });
+
+    const drawMol = (m) => {
+      const near = false, strength = 0;
+      if (m.spr && m.spr.ready) {
+        const dsz = m.s * 5.2;
+        ctx.save();
+        ctx.translate(m.x, m.y); ctx.rotate(m.a);
+        ctx.globalAlpha = 0.4;
+        ctx.drawImage(m.spr.img, -dsz / 2, -dsz / 2, dsz, dsz);
+        ctx.restore();
+        ctx.globalAlpha = 1;
+        return;
+      }
+      const cos = Math.cos(m.a), sin = Math.sin(m.a);
+      const P = m.t.atoms.map(at => ({
+        x: m.x + (at.x * cos - at.y * sin) * m.s,
+        y: m.y + (at.x * sin + at.y * cos) * m.s,
+        el: at.el
+      }));
+      const col = near ? accent + "," : bondCol;
+      const baseA = near ? 0.28 + strength * 0.5 : 0.26;
+      ctx.lineWidth = 1.15; ctx.lineCap = "round";
+      const pad = m.s * 0.32;
+      for (const [i, j, order] of m.t.bonds) {
+        let a = P[i], b = P[j];
+        let ax = a.x, ay = a.y, bx = b.x, by = b.y;
+        const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
+        const ux = dx / len, uy = dy / len;
+        if (a.el) { ax += ux * pad; ay += uy * pad; }
+        if (b.el) { bx -= ux * pad; by -= uy * pad; }
+        ctx.strokeStyle = col + baseA + ")";
+        if (order === 2) {
+          const ox = -uy * 2.2, oy = ux * 2.2;
+          ctx.beginPath(); ctx.moveTo(ax + ox, ay + oy); ctx.lineTo(bx + ox, by + oy); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(ax - ox, ay - oy); ctx.lineTo(bx - ox, by - oy); ctx.stroke();
+        } else {
+          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+        }
+      }
+      // heteroatom labels
+      ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.font = "600 " + (m.s * 0.62).toFixed(0) + "px 'Geist Mono', monospace";
+      for (const p of P) {
+        if (!p.el) continue;
+        ctx.globalAlpha = 1; ctx.fillStyle = bg;
+        ctx.beginPath(); ctx.arc(p.x, p.y, m.s * 0.34, 0, 6.283); ctx.fill();
+        ctx.globalAlpha = near ? 0.55 + strength * 0.45 : 0.5;
+        ctx.fillStyle = (HETCOL[p.el] || "rgba(120,120,120,") + "1)";
+        ctx.fillText(p.el, p.x, p.y + 0.5);
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    const RM = 175;       // mouse repulsion radius
+    const LINKD = 235;     // inter-molecular link distance
+    const radOf = (m) => m.s * 1.9;
+
+    const draw = () => {
+      ctx.clearRect(0, 0, w, h);
+
+      // ---- physics (background only: calm, steady drift) ----
+      for (const m of mols) {
+        m.x += m.vx; m.y += m.vy; m.a += m.va;
+        const marg = m.s * 3.5;
+        if (m.x < -marg) m.x = w + marg; if (m.x > w + marg) m.x = -marg;
+        if (m.y < -marg) m.y = h + marg; if (m.y > h + marg) m.y = -marg;
+      }
+
+      // ---- inter-molecular links (dashed, faint) ----
+      ctx.save();
+      ctx.setLineDash([1.5, 5]);
+      ctx.lineWidth = 1;
+      for (let i = 0; i < mols.length; i++) {
+        for (let j = i + 1; j < mols.length; j++) {
+          const a = mols[i], b = mols[j];
+          const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
+          if (d < LINKD) {
+            const ux = dx / d, uy = dy / d;
+            const ax = a.x + ux * radOf(a) * 0.5, ay = a.y + uy * radOf(a) * 0.5;
+            const bx = b.x - ux * radOf(b) * 0.5, by = b.y - uy * radOf(b) * 0.5;
+            ctx.strokeStyle = bondCol + ((1 - d / LINKD) * 0.22).toFixed(3) + ")";
+            ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+
+      // ---- molecules ----
+      for (const m of mols) drawMol(m);
+
+      this._raf = requestAnimationFrame(draw);
+    };
+    draw();
+    window.addEventListener("resize", resize);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._rotTimer); clearTimeout(this._typeTimer); clearTimeout(this._ct);
+    clearInterval(this._rdkitPoll); clearInterval(this._vidTimer); clearInterval(this._tickPoll);
+    clearTimeout(this._resizeRetry); if (this._ro) this._ro.disconnect();
+    cancelAnimationFrame(this._raf);
+  }
+
+  renderVals() {
+    return {
+      toggleTheme: this.toggleTheme,
+      themeGlyph: this.state.theme === "dark" ? "☀" : "☾",
+      copyBrew: this.copy,
+      brewLabel: this.state.copied ? "Copied ✓" : "Copy"
+    };
+  }
+}
+</script>
+</body>
+</html>
