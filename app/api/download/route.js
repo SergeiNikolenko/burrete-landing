@@ -3,29 +3,39 @@ const REPO = "Burrete";
 const RELEASES_URL = `https://github.com/${OWNER}/${REPO}/releases`;
 const LATEST_RELEASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/releases/latest`;
 
-module.exports = async function handler(req, res) {
-  if (req.method !== "GET" && req.method !== "HEAD") {
-    res.setHeader("Allow", "GET, HEAD");
-    res.status(405).send("Method Not Allowed");
-    return;
-  }
+export const dynamic = "force-dynamic";
 
-  res.setHeader(
-    "Cache-Control",
-    "no-store, max-age=0",
-  );
+export async function GET() {
+  return redirectToLatestDmg();
+}
 
+export async function HEAD() {
+  return redirectToLatestDmg();
+}
+
+function redirect(location, extraHeaders = {}) {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: location,
+      "Cache-Control": "no-store, max-age=0",
+      ...extraHeaders,
+    },
+  });
+}
+
+async function redirectToLatestDmg() {
   try {
     const response = await fetch(LATEST_RELEASE_URL, {
       headers: {
         Accept: "application/vnd.github+json",
         "User-Agent": "burrete-landing-download-redirect",
       },
+      cache: "no-store",
     });
 
     if (!response.ok) {
-      res.redirect(302, RELEASES_URL);
-      return;
+      return redirect(RELEASES_URL);
     }
 
     const release = await response.json();
@@ -39,16 +49,14 @@ module.exports = async function handler(req, res) {
     });
 
     if (!dmg) {
-      res.redirect(302, release.html_url || RELEASES_URL);
-      return;
+      return redirect(release.html_url || RELEASES_URL);
     }
 
-    if (release.tag_name) {
-      res.setHeader("X-Burrete-Release", release.tag_name);
-    }
-    res.setHeader("X-Burrete-Asset", dmg.name);
-    res.redirect(302, dmg.browser_download_url);
+    return redirect(dmg.browser_download_url, {
+      ...(release.tag_name ? { "X-Burrete-Release": release.tag_name } : {}),
+      "X-Burrete-Asset": dmg.name,
+    });
   } catch {
-    res.redirect(302, RELEASES_URL);
+    return redirect(RELEASES_URL);
   }
-};
+}

@@ -1,0 +1,36 @@
+---
+title: Finder Quick Look
+description: Use Finder Quick Look for fast Burrete previews and reset it when macOS keeps stale extension state.
+---
+
+# Finder Quick Look
+
+Finder Quick Look is the fastest Burrete surface:
+
+1. Select a molecular file in Finder.
+2. Press Space.
+3. Inspect the preview without opening the desktop workspace.
+
+Quick Look is optimized for previewing the selected file. Use the desktop workspace when you need tabs, project navigation, grids, Ketcher, or maintenance panels.
+
+## Registration lifecycle
+
+Open Burrete once after install so macOS can register the app bundle and preview extension. If the app was replaced or updated, Finder can keep stale Quick Look state until the cache is refreshed.
+
+Refresh Quick Look manually with:
+
+```bash
+qlmanage -r
+qlmanage -r cache
+killall quicklookd 2>/dev/null || true
+```
+
+## Diagnostics
+
+For normal installs, start with:
+
+```bash
+bunx burrete doctor
+```
+
+For developer builds, the repository uses a `BURRETE_DEV_FLAVOR` value to avoid colliding with release bundle identifiers and other local installs.

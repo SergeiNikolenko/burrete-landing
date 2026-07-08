@@ -1,0 +1,40 @@
+---
+title: Quick Start
+description: Open files in Finder, the Burrete desktop workspace, and the command palette.
+---
+
+# Quick Start
+
+## Finder Quick Look
+
+1. Select a supported molecular file in Finder.
+2. Press Space.
+3. Use the preview for a fast visual check before opening the full workspace.
+
+Quick Look is optimized for quick file previews. It is not the same runtime surface as the desktop app.
+
+## Desktop workspace
+
+Open Burrete directly when you need a persistent workspace:
+
+- `Cmd+O` opens molecular structure files.
+- `Cmd+P` or `/` opens the command palette.
+- `Cmd+,` opens settings.
+- The sidebar browses project folders, nested structures, and recent files.
+
+## What to try first
+
+- Open a PDB, CIF, SDF, MOL2, XYZ, or GRO file.
+- Switch between available renderers when the preview exposes that option.
+- Open an SDF, SMILES, CSV, or TSV collection to use the RDKit grid.
+- Use Settings or the command palette for Quick Look reset, preview cache cleanup, logs, diagnostics, and maintenance.
+
+## When previews fail
+
+Start with:
+
+```bash
+bunx burrete doctor
+```
+
+Then see [Quick Look troubleshooting](/docs/troubleshooting/quick-look).

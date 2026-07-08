@@ -1,0 +1,50 @@
+---
+title: Development
+description: Build, validate, and change Burrete using the repository's focused development loops.
+---
+
+# Development
+
+The main Burrete repository contains the desktop app, Quick Look extension, iPhone preview app, bundled web runtimes, agent tools, and documentation.
+
+## Source of truth files
+
+| File | Owns |
+| --- | --- |
+| `config/preview-formats.json` | Supported file extensions, content types, renderer routing, grid routing, Quick Look limits, and VESTA handoff flags. |
+| `config/web-runtime-profiles.json` | Bundled web runtime assets for Tauri, Quick Look, grid, Mol*, and external-artifact profiles. |
+| `apps/desktop/src-tauri/AppMetadata.plist` | App-level document type metadata used by the Tauri bundle. |
+| `PreviewExtension/Info.plist` | Finder Quick Look preview extension metadata and supported content types. |
+| `PreviewExtension/ThumbnailInfo.plist` | Finder thumbnail extension metadata and supported content types. |
+| `apps/desktop/src-tauri/tauri.conf.json` | Tauri bundle metadata, resources, app identifiers, update config, and macOS file associations. |
+
+## Format registry check
+
+When a preview format or document type changes, keep the registry, plist files, and focused format tests in sync:
+
+```bash
+bun scripts/check-preview-format-registry.mjs
+```
+
+## Quick Look development
+
+Use a unique development flavor for local packaged builds:
+
+```bash
+BURRETE_DEV_FLAVOR=chat85b0 ./scripts/build.sh
+BURRETE_DEV_FLAVOR=chat85b0 ./scripts/install.sh
+```
+
+Then refresh Quick Look:
+
+```bash
+qlmanage -r
+qlmanage -r cache
+killall quicklookd 2>/dev/null || true
+```
+
+## Source links
+
+- [Repository](https://github.com/SergeiNikolenko/Burrete)
+- [Documentation map](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/README.md)
+- [Contributing](https://github.com/SergeiNikolenko/Burrete/blob/main/.github/CONTRIBUTING.md)

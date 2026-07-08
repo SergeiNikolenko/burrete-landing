@@ -1,0 +1,27 @@
+---
+title: Agent Plugin
+description: Burrete's agent-facing tools expose bounded molecular previews, reports, and workflow surfaces.
+---
+
+# Agent Plugin
+
+Burrete includes agent-facing tooling for local preview and workflow surfaces.
+
+The plugin and MCP surfaces are intended to pass bounded, intentionally shaped molecular artifacts rather than unbounded file contents.
+
+## Use cases
+
+- Open a molecular workspace from an agent workflow.
+- Produce bounded molecular reports.
+- Review molecule collections and trajectory artifacts.
+- Drive visual QA for preview runtime surfaces.
+
+## Boundaries
+
+Agent, browser-dev, desktop, tokenized preview, and native Quick Look are separate runtime surfaces. Passing one does not prove the others.
+
+When debugging agent workflows, keep the artifact path, runtime surface, and generated session files explicit.
+
+## Source reference
+
+See the [agent platform docs](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md) and [plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent).

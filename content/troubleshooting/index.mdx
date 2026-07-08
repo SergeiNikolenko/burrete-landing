@@ -1,0 +1,29 @@
+---
+title: Troubleshooting
+description: Common Burrete diagnostics for install, renderer, Quick Look, and cache issues.
+---
+
+# Troubleshooting
+
+Start with the doctor command:
+
+```bash
+bunx burrete doctor
+```
+
+It checks the app bundle, Quick Look extension, `qlmanage`, and installed version.
+
+## Common checks
+
+- Open `Burrete.app` once after install.
+- Confirm the app is installed where you expect it.
+- Refresh Quick Look after replacing the app.
+- Check whether the file type is supported.
+- Use the desktop workspace when the Finder Quick Look surface is too constrained.
+- Confirm optional tools such as `xyzrender` or VESTA are installed before using workflows that depend on them.
+
+## Diagnostics bundle
+
+The desktop app can export a local diagnostics bundle from Settings > System > Diagnostics or from the command palette.
+
+Diagnostics bundles are local files only. They do not upload telemetry and do not include raw molecule file contents or structure payloads.

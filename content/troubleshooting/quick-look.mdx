@@ -1,0 +1,41 @@
+---
+title: Quick Look Troubleshooting
+description: Reset Finder Quick Look state and identify stale Burrete preview extension issues.
+---
+
+# Quick Look Troubleshooting
+
+Finder can keep stale Quick Look state after an app update, reinstall, or local development build.
+
+## Reset Quick Look
+
+Run:
+
+```bash
+qlmanage -r
+qlmanage -r cache
+killall quicklookd 2>/dev/null || true
+```
+
+Then select a supported molecular file in Finder and press Space again.
+
+## Common failure points
+
+- The app was rebuilt but not reinstalled into the location Finder is using.
+- Quick Look cache was not refreshed after replacing the app.
+- The final app bundle does not contain `BurretePreview.appex`.
+- The final app bundle does not contain `BurreteThumbnail.appex`.
+- Vendored web assets are missing or stale.
+- Launch Services is still pointing at an older app bundle.
+- The selected file type is not registered to the expected content type.
+
+## Developer builds
+
+For local packaged testing, use a unique `BURRETE_DEV_FLAVOR` value so the installed app, extension IDs, container paths, and forced content types do not collide with the release namespace or another dev install.
+
+Example:
+
+```bash
+BURRETE_DEV_FLAVOR=chat85b0 ./scripts/build.sh
+BURRETE_DEV_FLAVOR=chat85b0 ./scripts/install.sh
+```

@@ -276,7 +276,7 @@
         <a class="nav-link" href="#features">Features</a>
         <a class="nav-link" href="#formats">Formats</a>
         <a class="nav-link" href="#install">Install</a>
-        <a class="nav-link" href="#docs">Docs</a>
+        <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="nav" data-analytics-target="docs-home">Docs</a>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
         <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; transition: border-color .25s ease;">
@@ -526,23 +526,23 @@
     <div class="docs-grid" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch;">
       <!-- doc links -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-        <a class="doc-card reveal spot" href="/out/github-readme?surface=docs-getting-started" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-readme" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/docs/get-started/install" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="getting-started" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">01</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Getting started</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install, first launch, and how Quick Look picks up the extension.</p>
-          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">README <span class="doc-arrow">↗</span></span>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Install guide <span class="doc-arrow">→</span></span>
         </a>
-        <a class="doc-card reveal spot" href="/out/github-readme?surface=docs-formats" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-readme" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/docs/formats" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="formats" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">02</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Formats &amp; engines</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Which extension routes to Mol*, RDKit grids or xyzrender.</p>
-          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Reference <span class="doc-arrow">↗</span></span>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Reference <span class="doc-arrow">→</span></span>
         </a>
-        <a class="doc-card reveal spot" href="/out/github-issues?surface=docs" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-issues" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/docs/troubleshooting" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="troubleshooting" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">03</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Troubleshooting</div>
-          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Previews not showing? Run <span style="font-family: 'Geist Mono', monospace; color: var(--text);">burrete doctor</span> or open an issue.</p>
-          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Issues <span class="doc-arrow">↗</span></span>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Previews not showing? Run <span style="font-family: 'Geist Mono', monospace; color: var(--text);">burrete doctor</span> or reset Quick Look.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Fix previews <span class="doc-arrow">→</span></span>
         </a>
         <a class="doc-card reveal spot" href="/out/github-releases?surface=docs" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-releases" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">04</div>
@@ -609,7 +609,7 @@
       <div style="display: flex; gap: 22px; flex-wrap: wrap;">
         <a class="nav-link" href="/out/github-repo?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-repo">GitHub</a>
         <a class="nav-link" href="/out/github-releases?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-releases">Releases</a>
-        <a class="nav-link" href="/out/github-readme?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-readme">Docs</a>
+        <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="footer" data-analytics-target="docs-home">Docs</a>
         <span>MIT License</span>
         <span>macOS 12+</span>
       </div>

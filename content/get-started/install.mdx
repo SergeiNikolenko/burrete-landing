@@ -1,0 +1,55 @@
+---
+title: Install Burrete
+description: Install Burrete with Homebrew, the Bun CLI, or GitHub Releases.
+---
+
+# Install Burrete
+
+Burrete supports macOS 12 and later.
+
+## Homebrew
+
+Install from the Burrete tap:
+
+```bash
+brew tap SergeiNikolenko/burrete
+brew install --cask burrete
+```
+
+Check the installed cask version:
+
+```bash
+brew info --cask SergeiNikolenko/burrete/burrete
+```
+
+## Bun CLI
+
+Use the CLI when you want the latest stable GitHub release or a quick health check:
+
+```bash
+bunx burrete latest
+bunx burrete install
+bunx burrete doctor
+```
+
+The Bun installer places Burrete in `~/Applications` by default. Use `bunx burrete install --system` only when you intentionally want the app in `/Applications` for all users.
+
+## GitHub Releases
+
+You can also install manually:
+
+1. Open the [latest release](https://github.com/SergeiNikolenko/Burrete/releases/latest).
+2. Download the `Burrete-<version>.zip` file.
+3. Unzip it.
+4. Move `Burrete.app` to your `Applications` folder.
+5. Open Burrete once from `Applications`.
+
+## First launch
+
+Open `Burrete.app` once after installation. This gives macOS a chance to register the app bundle and Finder Quick Look extension.
+
+If Finder previews do not appear after install, run:
+
+```bash
+bunx burrete doctor
+```
