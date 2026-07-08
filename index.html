@@ -12,14 +12,68 @@
 <script defer src="/_vercel/speed-insights/script.js"></script>
 <script>
   (() => {
+    const campaignParams = ["ref"];
+    const trackedScrollDepths = new Set();
+
+    const track = (name, payload = {}) => {
+      if (typeof window.va === "function") window.va("event", name, payload);
+    };
+
+    const campaignQuery = () => {
+      const current = new URLSearchParams(window.location.search);
+      const preserved = new URLSearchParams();
+      current.forEach((value, key) => {
+        if (key.startsWith("utm_") || campaignParams.includes(key)) preserved.set(key, value);
+      });
+      return preserved;
+    };
+
+    const preserveCampaign = (link) => {
+      const url = new URL(link.href, window.location.href);
+      if (url.origin !== window.location.origin) return;
+      if (!url.pathname.startsWith("/download") && !url.pathname.startsWith("/out/")) return;
+      campaignQuery().forEach((value, key) => {
+        if (!url.searchParams.has(key)) url.searchParams.set(key, value);
+      });
+      link.href = url.pathname + url.search + url.hash;
+    };
+
+    const currentSection = () => {
+      const sections = ["docs", "install", "features", "formats", "top"];
+      for (const id of sections) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const rect = el.getBoundingClientRect();
+        if (rect.top <= 160 && rect.bottom > 160) return id;
+      }
+      return "unknown";
+    };
+
+    const checkScrollDepth = () => {
+      const maxScroll = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
+      const depth = Math.min(100, Math.round((window.scrollY / maxScroll) * 100));
+      [25, 50, 75, 100].forEach((threshold) => {
+        if (depth >= threshold && !trackedScrollDepths.has(threshold)) {
+          trackedScrollDepths.add(threshold);
+          track("Scroll Depth", { depth: String(threshold), section: currentSection() });
+        }
+      });
+    };
+
     document.addEventListener("click", (event) => {
-      const link = event.target.closest && event.target.closest('a[data-analytics-event="Download"]');
-      if (!link || typeof window.va !== "function") return;
-      window.va("event", "Download", {
+      const link = event.target.closest && event.target.closest("a[href]");
+      if (!link) return;
+      preserveCampaign(link);
+      const eventName = link.dataset.analyticsEvent;
+      if (!eventName) return;
+      track(eventName, {
         location: link.dataset.analyticsLocation || "unknown",
-        target: "dmg",
+        target: link.dataset.analyticsTarget || "unknown",
       });
     }, { capture: true });
+
+    window.addEventListener("scroll", checkScrollDepth, { passive: true });
+    window.addEventListener("load", checkScrollDepth);
   })();
 </script>
 </head>
@@ -228,7 +282,7 @@
         <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; transition: border-color .25s ease;">
           <span style="display: block;">{{ themeGlyph }}</span>
         </button>
-        <a class="btn-primary magnetic" href="/download?source=nav" data-analytics-event="Download" data-analytics-location="nav" style="display: inline-flex; align-items: center; gap: 8px; background: var(--invert-bg); color: var(--invert-fg); padding: 10px 17px; border-radius: 9px; font-size: 14px; font-weight: 500;"><span class="shine"></span>Download</a>
+        <a class="btn-primary magnetic" href="/download?source=nav" data-analytics-event="Download" data-analytics-location="nav" data-analytics-target="dmg" style="display: inline-flex; align-items: center; gap: 8px; background: var(--invert-bg); color: var(--invert-fg); padding: 10px 17px; border-radius: 9px; font-size: 14px; font-weight: 500;"><span class="shine"></span>Download</a>
       </div>
     </div>
   </div>
@@ -247,7 +301,7 @@
       <h1 class="hero-title" style="font-size: clamp(38px, 6vw, 66px); line-height: 1.03; letter-spacing: -0.038em; font-weight: 700; margin: 0 auto; max-width: 840px; color: var(--text);"><span class="word" style="animation-delay:.02s">Quick</span> <span class="word" style="animation-delay:.09s">Look</span> <span class="word" style="animation-delay:.16s">for</span> <span class="word" style="animation-delay:.23s">molecular</span> <span class="word" style="animation-delay:.3s">files</span> <span class="word" style="animation-delay:.37s">on macOS.</span></h1>
       <p style="font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: var(--body); max-width: 630px; margin: 26px auto 0;">Press Space on PDB, CIF, SDF, XYZ, trajectories, or chemistry tables. Open Burrete when you need tabs, 3D inspection, RDKit grids, sketching, or export.</p>
       <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 38px;">
-        <a class="btn-primary magnetic" href="/download?source=hero" data-analytics-event="Download" data-analytics-location="hero" style="background: var(--invert-bg); color: var(--invert-fg); padding: 14px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 9px;"><span class="shine"></span>Download for macOS</a>
+        <a class="btn-primary magnetic" href="/download?source=hero" data-analytics-event="Download" data-analytics-location="hero" data-analytics-target="dmg" style="background: var(--invert-bg); color: var(--invert-fg); padding: 14px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 9px;"><span class="shine"></span>Download for macOS</a>
         <a class="btn-ghost" href="#install" style="display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--text); padding: 14px 20px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--nav);"><span style="color: var(--mono);">$</span> brew install --cask burrete</a>
       </div>
 
@@ -472,25 +526,25 @@
     <div class="docs-grid" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch;">
       <!-- doc links -->
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
-        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/out/github-readme?surface=docs-getting-started" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-readme" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">01</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Getting started</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install, first launch, and how Quick Look picks up the extension.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">README <span class="doc-arrow">↗</span></span>
         </a>
-        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/out/github-readme?surface=docs-formats" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-readme" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">02</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Formats &amp; engines</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Which extension routes to Mol*, RDKit grids or xyzrender.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Reference <span class="doc-arrow">↗</span></span>
         </a>
-        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete/issues" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/out/github-issues?surface=docs" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-issues" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">03</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Troubleshooting</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Previews not showing? Run <span style="font-family: 'Geist Mono', monospace; color: var(--text);">burrete doctor</span> or open an issue.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Issues <span class="doc-arrow">↗</span></span>
         </a>
-        <a class="doc-card reveal spot" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/out/github-releases?surface=docs" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-releases" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">04</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Changelog</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Release notes, builds and every tagged version.</p>
@@ -521,25 +575,25 @@
     <h2 class="reveal" style="font-size: clamp(24px, 3.2vw, 34px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; color: var(--text);">Open-source engines, wired into Finder.</h2>
     <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 34px;">Burrete keeps the viewer small and lets Mol*, RDKit, xyzrender, and Ketcher do the specialist work.</p>
     <div class="src-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
-      <a class="src-link reveal" href="https://molstar.org" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+      <a class="src-link reveal" href="/out/molstar?surface=sources" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="sources" data-analytics-target="molstar" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
         <span style="width: 10px; height: 10px; border-radius: 3px; background: var(--accent);"></span>
         <span style="font-size: 16px; font-weight: 600; color: var(--text);">Mol*</span>
         <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Interactive 3D structure viewer used across structural biology.</span>
         <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">molstar.org ↗</span>
       </a>
-      <a class="src-link reveal" href="https://github.com/aligfellow/xyzrender" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+      <a class="src-link reveal" href="/out/xyzrender?surface=sources" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="sources" data-analytics-target="xyzrender" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
         <span style="width: 10px; height: 10px; border-radius: 3px; background: #8a8f2a;"></span>
         <span style="font-size: 16px; font-weight: 600; color: var(--text);">xyzrender</span>
         <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Depth-cued SVG / PNG / PDF renderer for XYZ &amp; QM output.</span>
         <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">aligfellow/xyzrender ↗</span>
       </a>
-      <a class="src-link reveal" href="https://www.rdkit.org" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+      <a class="src-link reveal" href="/out/rdkit?surface=sources" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="sources" data-analytics-target="rdkit" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
         <span style="width: 10px; height: 10px; border-radius: 3px; background: #4f5bd5;"></span>
         <span style="font-size: 16px; font-weight: 600; color: var(--text);">RDKit</span>
         <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">Cheminformatics toolkit behind the molecule grids.</span>
         <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">rdkit.org ↗</span>
       </a>
-      <a class="src-link reveal" href="https://github.com/epam/ketcher" target="_blank" rel="noopener" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+      <a class="src-link reveal" href="/out/ketcher?surface=sources" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="sources" data-analytics-target="ketcher" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
         <span style="width: 10px; height: 10px; border-radius: 3px; background: #c9761e;"></span>
         <span style="font-size: 16px; font-weight: 600; color: var(--text);">Ketcher</span>
         <span style="font-size: 13px; color: var(--muted); line-height: 1.5; flex: 1;">The 2D chemical structure editor used for sketching.</span>
@@ -553,9 +607,9 @@
     <div style="max-width: 1200px; margin: 0 auto; padding: 40px 32px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 18px; font-family: 'Geist Mono', monospace; font-size: 13px; color: var(--mono);">
       <span style="font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.02em;">Burrete</span>
       <div style="display: flex; gap: 22px; flex-wrap: wrap;">
-        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete" target="_blank" rel="noopener">GitHub</a>
-        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete/releases" target="_blank" rel="noopener">Releases</a>
-        <a class="nav-link" href="https://github.com/SergeiNikolenko/Burrete#readme" target="_blank" rel="noopener">Docs</a>
+        <a class="nav-link" href="/out/github-repo?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-repo">GitHub</a>
+        <a class="nav-link" href="/out/github-releases?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-releases">Releases</a>
+        <a class="nav-link" href="/out/github-readme?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-readme">Docs</a>
         <span>MIT License</span>
         <span>macOS 12+</span>
       </div>
@@ -682,6 +736,7 @@ class Component extends DCLogic {
   copy = () => {
     const cmd = "brew tap SergeiNikolenko/burrete\nbrew install --cask burrete";
     try { navigator.clipboard && navigator.clipboard.writeText(cmd); } catch (e) {}
+    try { window.va && window.va("event", "Copy Brew Install", { location: "install", target: "brew" }); } catch (e) {}
     this.setState({ copied: true });
     clearTimeout(this._ct);
     this._ct = setTimeout(() => this.setState({ copied: false }), 1500);

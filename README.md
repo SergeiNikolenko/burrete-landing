@@ -6,6 +6,12 @@ The `/download` route records a lightweight Web Analytics page view, then
 redirects to the `.dmg` asset from the latest `SergeiNikolenko/Burrete`
 GitHub release through `/api/download`.
 
+Outbound links use `/out/:target` so clicks to GitHub, docs, releases, and
+engine websites are visible as first-party Web Analytics page views before
+redirecting to the external destination. The main page also emits Vercel custom
+events for download clicks, outbound clicks, brew-copy intent, and scroll depth
+when the project plan supports custom events.
+
 ## Local Preview
 
 ```sh
