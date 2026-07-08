@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/download",
-      "destination": "/api/download"
+      "destination": "/download.html"
     }
   ]
 }

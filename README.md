@@ -2,8 +2,9 @@
 
 Static landing page for Burrete, the molecular file workspace for macOS.
 
-The `/download` route redirects to the `.dmg` asset from the latest
-`SergeiNikolenko/Burrete` GitHub release.
+The `/download` route records a lightweight Web Analytics page view, then
+redirects to the `.dmg` asset from the latest `SergeiNikolenko/Burrete`
+GitHub release through `/api/download`.
 
 ## Local Preview
 
