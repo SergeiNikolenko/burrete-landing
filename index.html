@@ -39,7 +39,7 @@
     };
 
     const currentSection = () => {
-      const sections = ["docs", "install", "features", "formats", "top"];
+      const sections = ["docs", "install", "codex", "features", "formats", "top"];
       for (const id of sections) {
         const el = document.getElementById(id);
         if (!el) continue;
@@ -80,10 +80,10 @@
 <body>
 <x-dc>
 <helmet>
-<title>Burrete | Quick Look for molecular files</title>
-<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app: Mol* 3D, RDKit grids, trajectories, sketching, and xyzrender artwork.">
-<meta property="og:title" content="Burrete | Quick Look for molecular files">
-<meta property="og:description" content="Press Space on PDB, CIF, SDF, XYZ, trajectories, and chemistry tables. Open Burrete when you need tabs, grids, sketching, or export.">
+<title>Burrete | Molecular Quick Look and Codex MCP</title>
+<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app, with a local Codex plugin and typed MCP tools for molecular workspaces.">
+<meta property="og:title" content="Burrete | Molecular Quick Look and Codex MCP">
+<meta property="og:description" content="Preview PDB, CIF, SDF, XYZ, trajectories, and chemistry tables on macOS, then connect Codex through focused skills and a local MCP server.">
 <meta property="og:type" content="website">
 <meta property="og:image" content="assets/burrete-quicklook.png">
 <meta name="theme-color" content="#0a0a0a">
@@ -275,6 +275,7 @@
       <div class="nav-links" style="display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--nav);">
         <a class="nav-link" href="#features">Features</a>
         <a class="nav-link" href="#formats">Formats</a>
+        <a class="nav-link" href="#codex">Codex + MCP</a>
         <a class="nav-link" href="#install">Install</a>
         <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="nav" data-analytics-target="docs-home">Docs</a>
       </div>
@@ -483,6 +484,51 @@
     </div>
   </div>
 
+  <!-- ============ CODEX + MCP ============ -->
+  <div id="codex" class="sec-pad" style="border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface);">
+    <div class="install-grid" style="max-width: 1200px; margin: 0 auto; padding: 84px 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center;">
+      <div class="reveal">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Codex plugin · local MCP</span>
+          <span class="pill beam"><span class="pdot"></span>Skills + typed tools</span>
+        </div>
+        <h2 style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 16px; color: var(--text);">Let Codex operate the same molecular workspace.</h2>
+        <p style="font-size: 15px; color: var(--body); line-height: 1.65; max-width: 520px; margin: 0 0 22px;">The Burrete plugin combines focused workflow skills with a local stdio MCP server. Codex can open a structure, observe the active workspace, run allowlisted Mol* actions, and render bounded review panels while keeping local-file provenance explicit.</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 9px; margin-bottom: 26px;">
+          <span class="pill">Open structures</span>
+          <span class="pill">Inspect scene state</span>
+          <span class="pill">Control Mol*</span>
+          <span class="pill">Render reports</span>
+        </div>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+          <a class="btn-primary" href="/docs/plugin" data-analytics-event="Docs Link" data-analytics-location="codex" data-analytics-target="plugin-guide" style="display: inline-flex; align-items: center; gap: 8px; background: var(--invert-bg); color: var(--invert-fg); padding: 12px 18px; border-radius: 9px; font-size: 14px; font-weight: 500;"><span class="shine"></span>Plugin guide</a>
+          <a class="btn-ghost" href="https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="codex" data-analytics-target="plugin-source" style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-2); padding: 12px 18px; border-radius: 9px; font-size: 14px; color: var(--nav);">Source in Burrete ↗</a>
+        </div>
+      </div>
+      <div class="codex-panel reveal" style="border: 1px solid var(--border); border-radius: 16px; min-height: 390px;">
+        <div style="width: 100%; background: color-mix(in srgb, var(--bg) 86%, transparent); border: 1px solid var(--border-2); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-card);">
+          <div style="display: flex; align-items: center; justify-content: space-between; padding: 13px 16px; border-bottom: 1px solid var(--border);">
+            <span style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--mono);">Burrete · local MCP</span>
+            <span class="pill" style="padding: 5px 10px;"><span class="pdot"></span>Local</span>
+          </div>
+          <div style="padding: 20px; display: flex; flex-direction: column; gap: 16px;">
+            <div style="font-family: 'Geist Mono', monospace; font-size: 13px; line-height: 1.75; color: var(--text); background: var(--surface-2); border: 1px solid var(--border); border-radius: 9px; padding: 14px 16px;">
+              <div><span style="color: var(--mono);">$</span> bun run install:plugin</div>
+              <div><span style="color: var(--accent);">@Burrete</span> open this structure and focus the ligand</div>
+            </div>
+            <div style="display: grid; gap: 8px; font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--nav);">
+              <div style="border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px;"><span style="color: var(--accent);">01</span>&nbsp; burrete.get_context</div>
+              <div style="border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px;"><span style="color: var(--accent);">02</span>&nbsp; burrete.open_workspace</div>
+              <div style="border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px;"><span style="color: var(--accent);">03</span>&nbsp; burrete.observe_workspace</div>
+              <div style="border: 1px solid var(--border); border-radius: 8px; padding: 9px 11px;"><span style="color: var(--accent);">04</span>&nbsp; burrete.control_viewer</div>
+            </div>
+            <a href="https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="codex" data-analytics-target="agent-platform" style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent); text-decoration: none;">Read the MCP contract in the main repository ↗</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ============ INSTALL ============ -->
   <div id="install" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 80px 32px; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
     <div class="install-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 44px; align-items: center;">
@@ -518,7 +564,7 @@
   <div id="docs" class="sec-pad" style="max-width: 1200px; margin: 0 auto; padding: 84px 32px; border-bottom: 1px solid var(--border);">
     <div class="reveal" style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-bottom: 14px;">
       <span style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono);">Docs</span>
-      <span class="pill beam"><span class="pdot"></span>Source, releases, issues</span>
+      <span class="pill beam"><span class="pdot"></span>Source, plugin, releases</span>
     </div>
     <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; max-width: 640px; color: var(--text);">Read it, run it, fix it.</h2>
     <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 40px;">Install notes, Quick Look registration, shortcuts, and the doctor command for broken previews.</p>
@@ -544,11 +590,11 @@
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Previews not showing? Run <span style="font-family: 'Geist Mono', monospace; color: var(--text);">burrete doctor</span> or reset Quick Look.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Fix previews <span class="doc-arrow">→</span></span>
         </a>
-        <a class="doc-card reveal spot" href="/out/github-releases?surface=docs" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="docs" data-analytics-target="github-releases" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+        <a class="doc-card reveal spot" href="/docs/plugin" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="plugin-guide" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">04</div>
-          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Changelog</div>
-          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Release notes, builds and every tagged version.</p>
-          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Releases <span class="doc-arrow">↗</span></span>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Codex plugin &amp; MCP</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install the local plugin and review its typed molecular tool surface.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Plugin guide <span class="doc-arrow">→</span></span>
         </a>
       </div>
       <!-- shortcuts panel -->
@@ -610,6 +656,7 @@
         <a class="nav-link" href="/out/github-repo?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-repo">GitHub</a>
         <a class="nav-link" href="/out/github-releases?surface=footer" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="footer" data-analytics-target="github-releases">Releases</a>
         <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="footer" data-analytics-target="docs-home">Docs</a>
+        <a class="nav-link" href="/docs/plugin" data-analytics-event="Docs Link" data-analytics-location="footer" data-analytics-target="plugin-guide">Codex + MCP</a>
         <span>MIT License</span>
         <span>macOS 12+</span>
       </div>

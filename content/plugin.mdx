@@ -1,27 +1,59 @@
 ---
-title: Agent Plugin
-description: Burrete's agent-facing tools expose bounded molecular previews, reports, and workflow surfaces.
+title: Codex Plugin and MCP
+description: Install Burrete as a local Codex plugin with focused workflow skills and typed MCP tools for molecular workspaces.
 ---
 
-# Agent Plugin
+# Codex Plugin and MCP
 
-Burrete includes agent-facing tooling for local preview and workflow surfaces.
+Burrete includes a Codex-local plugin that connects Codex to the same molecular workspace used by the macOS app. It combines focused workflow skills with a typed local MCP server.
 
-The plugin and MCP surfaces are intended to pass bounded, intentionally shaped molecular artifacts rather than unbounded file contents.
+The plugin stays in the [main Burrete repository](https://github.com/SergeiNikolenko/Burrete). There is no separate plugin repository.
 
-## Use cases
+## What Codex can do
 
-- Open a molecular workspace from an agent workflow.
-- Produce bounded molecular reports.
-- Review molecule collections and trajectory artifacts.
-- Drive visual QA for preview runtime surfaces.
+- Open molecular structures, SDF collections, trajectories, and result bundles.
+- Observe the active document, tabs, panels, viewer readiness, and Mol* scene state.
+- Run allowlisted viewer actions such as focusing ligands, hiding waters, changing representations, and resetting the camera.
+- Render bounded markdown, tables, charts, and molecular reports beside the workspace.
+- Keep local-file provenance explicit without exposing an arbitrary shell or unrestricted file-access tool.
 
-## Boundaries
+The short MCP facade is:
 
-Agent, browser-dev, desktop, tokenized preview, and native Quick Look are separate runtime surfaces. Passing one does not prove the others.
+```text
+burrete.get_context
+burrete.open_workspace
+burrete.observe_workspace
+burrete.control_viewer
+burrete.render_panel
+```
 
-When debugging agent workflows, keep the artifact path, runtime surface, and generated session files explicit.
+`burrete.open_workspace` returns a stable `workspaceSessionId`. Follow-up calls use that handle instead of carrying raw URLs or session-directory details through the conversation.
 
-## Source reference
+## Install in Codex
 
-See the [agent platform docs](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md) and [plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent).
+Clone the main repository and run its plugin installer:
+
+```bash
+git clone https://github.com/SergeiNikolenko/Burrete.git
+cd Burrete
+bun run install:plugin
+```
+
+Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. The installer stages the self-contained plugin and its dependencies in a dedicated local marketplace, registers that marketplace with Codex, and enables `burrete@burrete` through the Codex CLI.
+
+## Why it is local
+
+Burrete needs user-selected local molecular files and local Browser or desktop sessions. A Codex-local plugin with a stdio MCP server matches that boundary; it is not presented as a hosted ChatGPT app.
+
+The MCP layer exposes purpose-built molecular operations. It does not provide arbitrary JavaScript or shell execution. Local HTTP surfaces are token-gated, payloads are bounded, and destructive overwrites or remote-job submission remain outside the plugin contract.
+
+Browser development, the desktop app, tokenized preview, native Quick Look, and the MCP process are separate runtime surfaces. Passing one does not prove the others.
+
+## Source and contracts
+
+- [Burrete repository](https://github.com/SergeiNikolenko/Burrete)
+- [Codex plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent)
+- [Plugin installation and architecture](https://github.com/SergeiNikolenko/Burrete/blob/main/plugins/burette-agent/README.md)
+- [Agent platform and MCP contract](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md)
+- [Privacy notice](https://github.com/SergeiNikolenko/Burrete/blob/main/PRIVACY.md)
+- [Terms](https://github.com/SergeiNikolenko/Burrete/blob/main/TERMS.md)

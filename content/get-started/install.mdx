@@ -1,6 +1,6 @@
 ---
 title: Install Burrete
-description: Install Burrete with Homebrew, the Bun CLI, or GitHub Releases.
+description: Install Burrete with Homebrew, the Bun CLI, or GitHub Releases, and optionally connect it to Codex through the local MCP plugin.
 ---
 
 # Install Burrete
@@ -53,3 +53,17 @@ If Finder previews do not appear after install, run:
 ```bash
 bunx burrete doctor
 ```
+
+## Codex plugin and local MCP
+
+The optional Codex integration lives in the same [Burrete repository](https://github.com/SergeiNikolenko/Burrete) as the app. It bundles workflow skills with typed MCP tools for opening, observing, and controlling a local molecular workspace.
+
+Clone the repository and run the plugin installer:
+
+```bash
+git clone https://github.com/SergeiNikolenko/Burrete.git
+cd Burrete
+bun run install:plugin
+```
+
+Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. See [Codex Plugin and MCP](/docs/plugin) for the tool surface, security boundaries, and source links.

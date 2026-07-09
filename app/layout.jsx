@@ -9,7 +9,7 @@ export const metadata = {
     template: "%s | Burrete Docs",
   },
   description:
-    "Documentation for Burrete, a macOS molecular file workspace with Finder Quick Look previews.",
+    "Documentation for Burrete, a macOS molecular file workspace with Finder Quick Look previews and a local Codex MCP plugin.",
 };
 
 export default async function RootLayout({ children }) {

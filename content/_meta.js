@@ -5,6 +5,6 @@ export default {
   engines: "Engines",
   formats: "Formats",
   troubleshooting: "Troubleshooting",
-  plugin: "Agent Plugin",
+  plugin: "Codex Plugin & MCP",
   development: "Development",
 };
