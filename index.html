@@ -80,17 +80,17 @@
 <body>
 <x-dc>
 <helmet>
-<title>Burrete | Molecular Quick Look and Codex MCP</title>
-<meta name="description" content="Burrete previews molecular files in Finder Quick Look and a compact macOS app, with a local Codex plugin and typed MCP tools for molecular workspaces.">
-<meta property="og:title" content="Burrete | Molecular Quick Look and Codex MCP">
-<meta property="og:description" content="Preview PDB, CIF, SDF, XYZ, trajectories, and chemistry tables on macOS, then connect Codex through focused skills and a local MCP server.">
+<title>Burrete | Molecular workspace, Quick Look, xTB and CREST</title>
+<meta name="description" content="Preview molecular files in Finder, manage SDF collections with target-aware drag and drop, and run local xTB or CREST workflows in the Burrete macOS workspace.">
+<meta property="og:title" content="Burrete | Molecular workspace, Quick Look, xTB and CREST">
+<meta property="og:description" content="Preview PDB, CIF, SDF, XYZ, trajectories, and chemistry tables; manage collections; run local calculations; and connect Codex through typed MCP tools.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://burrete-landing.vercel.app/">
 <meta property="og:image" content="https://burrete-landing.vercel.app/assets/burrete-quicklook.png">
 <meta property="og:image:alt" content="Burrete showing a molecular structure in macOS Finder Quick Look">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Burrete | Molecular Quick Look and Codex MCP">
-<meta name="twitter:description" content="Preview PDB, CIF, SDF, XYZ, trajectories, and chemistry tables on macOS.">
+<meta name="twitter:title" content="Burrete | Molecular workspace, Quick Look, xTB and CREST">
+<meta name="twitter:description" content="Preview PDB, CIF, SDF, XYZ, trajectories, and chemistry tables; manage collections; run local calculations; and connect Codex through typed MCP tools.">
 <meta name="twitter:image" content="https://burrete-landing.vercel.app/assets/burrete-quicklook.png">
 <link rel="canonical" href="https://burrete-landing.vercel.app/">
 <meta name="theme-color" content="#0a0a0a">
@@ -239,6 +239,8 @@
   #lightbox { position: fixed; inset: 0; z-index: 10000; background: rgba(8,8,10,.82); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; padding: 5vh 5vw; cursor: zoom-out; opacity: 0; transition: opacity .3s ease; }
   #lightbox.open { display: flex; opacity: 1; }
   #lightbox img { max-width: 100%; max-height: 100%; border-radius: 12px; box-shadow: 0 40px 120px -30px rgba(0,0,0,.9); animation: rise .4s cubic-bezier(.22,.61,.36,1) both; }
+  #lightbox-close { position: absolute; top: max(18px, env(safe-area-inset-top)); right: max(18px, env(safe-area-inset-right)); width: 42px; height: 42px; border: 1px solid rgba(255,255,255,.45); border-radius: 999px; background: rgba(8,8,10,.7); color: #fff; font-size: 25px; line-height: 1; cursor: pointer; }
+  .mobile-docs { display: none; }
 
   /* tweaks: motion */
   html[data-motion="calm"] .tilt:hover img, html[data-motion="calm"] .tilt:hover video { transform: scale(1.02); }
@@ -258,18 +260,23 @@
   }
   @media (max-width: 720px) {
     .nav-links { display: none !important; }
+    .mobile-docs { display: inline-flex; }
     .feat-grid { grid-template-columns: 1fr !important; }
+    .workflow-grid { grid-template-columns: 1fr !important; }
+    .workflow-card { grid-template-columns: 1fr !important; }
+    .workflow-card img { border-left: 0 !important; border-top: 1px solid var(--border); }
     .install-grid { grid-template-columns: 1fr !important; }
     .fmt-grid { grid-template-columns: 1fr !important; }
+    .docs-grid { grid-template-columns: 1fr !important; }
+    .doc-links-grid { grid-template-columns: 1fr !important; }
     .src-grid { grid-template-columns: 1fr 1fr !important; }
     .hero-pad { padding-left: 22px !important; padding-right: 22px !important; }
     .sec-pad { padding-left: 22px !important; padding-right: 22px !important; }
   }
 </style>
-<script src="https://unpkg.com/@rdkit/rdkit/dist/RDKit_minimal.js"></script>
 </helmet>
 
-<div id="lightbox"><img id="lightbox-img" alt=""></div>
+<div id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview" aria-hidden="true" tabIndex="-1"><button id="lightbox-close" type="button" aria-label="Close image preview">×</button><img id="lightbox-img" alt=""></div>
 
 <div style="font-family: 'Geist', 'Helvetica Neue', Arial, sans-serif; background: var(--bg); color: var(--text); min-width: 0;">
 
@@ -287,6 +294,7 @@
         <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="nav" data-analytics-target="docs-home">Docs</a>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
+        <a class="mobile-docs nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="mobile-nav" data-analytics-target="docs-home" style="align-items: center; min-height: 38px; font-size: 14px;">Docs</a>
         <button onClick="{{ toggleTheme }}" aria-label="Toggle color theme" style="width: 38px; height: 38px; border-radius: 9px; border: 1px solid var(--border-2); background: var(--surface); color: var(--text); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; padding: 0; transition: border-color .25s ease;">
           <span style="display: block;">{{ themeGlyph }}</span>
         </button>
@@ -332,8 +340,8 @@
     <div class="reveal" style="margin: 0 -32px 40px; padding: 0 0;">
       <div class="marquee">
         <div class="marquee__track">
-          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.poscar</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
-          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.poscar</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
+          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.bcif</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
+          <span class="mq-chip"><span class="dot"></span>.pdb</span><span class="mq-chip"><span class="dot"></span>.cif</span><span class="mq-chip"><span class="dot"></span>.mmcif</span><span class="mq-chip"><span class="dot"></span>.sdf</span><span class="mq-chip"><span class="dot"></span>.mol2</span><span class="mq-chip"><span class="dot"></span>.xyz</span><span class="mq-chip"><span class="dot"></span>.gro</span><span class="mq-chip"><span class="dot"></span>.smiles</span><span class="mq-chip"><span class="dot"></span>.smi</span><span class="mq-chip"><span class="dot"></span>.csv</span><span class="mq-chip"><span class="dot"></span>.tsv</span><span class="mq-chip"><span class="dot"></span>.cube</span><span class="mq-chip"><span class="dot"></span>.log</span><span class="mq-chip"><span class="dot"></span>.out</span><span class="mq-chip"><span class="dot"></span>.psi4</span><span class="mq-chip"><span class="dot"></span>.vasp</span><span class="mq-chip"><span class="dot"></span>.mae</span><span class="mq-chip"><span class="dot"></span>.bcif</span><span class="mq-chip"><span class="dot"></span>.trj</span><span class="mq-chip"><span class="dot"></span>.mol</span>
         </div>
       </div>
     </div>
@@ -399,7 +407,7 @@
       <div>
         <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px;">RDKit collections</div>
         <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Triage whole libraries as a grid.</h3>
-        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Open SDF, SMILES, CSV or TSV as a searchable grid: sort, SMARTS-filter and highlight, select, merge and export. Flip the render engine from RDKit to xyzrender for publication-style cards across hundreds of molecules.</p>
+        <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Open SDF, SMILES, CSV or TSV as a searchable grid: sort, SMARTS-filter and highlight, select, merge and export. When the optional local executable supports the records, switch from RDKit to xyzrender cards.</p>
       </div>
       <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
         <img class="img-light zoomable" src="assets/grid-table-light.png" loading="lazy" decoding="async" alt="RDKit molecule grid" style="width: 100%; display: block;">
@@ -428,7 +436,7 @@
         <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Draw a lasso across the viewport to select and isolate residues and ligands directly in 3D. Pick a binding pocket without hunting a sequence list. The selection carries into measurements, isolation, and export.</p>
       </div>
       <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface-2);">
-        <video class="autoplay-loop" src="assets/lasso.mp4" autoplay muted loop playsinline preload="metadata" style="width: 100%; display: block;"></video>
+        <video class="autoplay-loop" src="assets/lasso.mp4" autoplay muted loop controls playsinline preload="metadata" aria-label="Demonstration of lasso selection in the molecular viewport" style="width: 100%; display: block;"></video>
       </div>
     </div>
 
@@ -488,6 +496,27 @@
           <span class="fmt-chip" style="border: 1px solid var(--border-2); border-radius: 6px; padding: 5px 9px;">iPhone app</span>
         </div>
       </div>
+    </div>
+
+    <div class="workflow-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px;">
+      <a class="doc-card reveal workflow-card" href="/docs/workflows/drag-and-drop" data-analytics-event="Docs Link" data-analytics-location="features" data-analytics-target="drag-and-drop" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: grid; grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); align-items: center;">
+        <div style="padding: 24px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">Target-aware drag &amp; drop</div>
+          <div style="font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px;">Drop by intent, not just by file type</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px;">Open together, append to a grid, import into Ketcher, or build a valid docking view from the target under the pointer.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Drag guide <span class="doc-arrow">→</span></span>
+        </div>
+        <img src="assets/workflow-drag-drop.svg" loading="lazy" decoding="async" alt="Diagram of Burrete drag-and-drop sources, action resolver, and targets" style="width: 100%; height: 100%; min-height: 220px; object-fit: contain; object-position: center; background: var(--surface-2); border-left: 1px solid var(--border);">
+      </a>
+      <a class="doc-card reveal workflow-card" href="/docs/workflows/xtb" data-analytics-event="Docs Link" data-analytics-location="features" data-analytics-target="xtb-crest" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: grid; grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); align-items: center;">
+        <div style="padding: 24px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">Local calculations</div>
+          <div style="font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px;">xTB properties and CREST ensembles</div>
+          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px;">Run installed executables as cancellable jobs with explicit settings, reports, logs, and reviewable artifacts.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Calculation guide <span class="doc-arrow">→</span></span>
+        </div>
+        <img src="assets/workflow-xtb.svg" loading="lazy" decoding="async" alt="Diagram of Burrete's local xTB calculation workflow" style="width: 100%; height: 100%; min-height: 220px; object-fit: contain; object-position: center; background: var(--surface-2); border-left: 1px solid var(--border);">
+      </a>
     </div>
   </div>
 
@@ -550,7 +579,7 @@
           <span class="pill"><span class="pdot"></span>Homebrew cask</span>
           <span class="pill">MIT License</span>
           <span class="pill">Notarized</span>
-          <span class="pill">~14 MB</span>
+          <span class="pill">Local-first</span>
         </div>
       </div>
       <div class="reveal" style="background: #0a0a0a; border: 1px solid #1e1e1e; border-radius: 14px; overflow: hidden; font-family: 'Geist Mono', monospace; box-shadow: 0 30px 60px -30px rgba(0,0,0,.6);">
@@ -560,7 +589,7 @@
             <span style="width: 11px; height: 11px; border-radius: 50%; background: #e3b53f;"></span>
             <span style="width: 11px; height: 11px; border-radius: 50%; background: #5ab552;"></span>
           </div>
-          <button onClick="{{ copyBrew }}" style="cursor: pointer; background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: #cfcfcf; font-family: 'Geist Mono', monospace; font-size: 11px; padding: 4px 10px;">{{ brewLabel }}</button>
+          <button onClick="{{ copyBrew }}" aria-label="Copy Homebrew install commands" aria-live="polite" style="cursor: pointer; background: none; border: 1px solid #2a2a2a; border-radius: 6px; color: #cfcfcf; font-family: 'Geist Mono', monospace; font-size: 11px; padding: 4px 10px;">{{ brewLabel }}</button>
         </div>
         <div id="term-body" style="padding: 22px 18px; font-size: 13.5px; line-height: 2; color: #ededed; min-height: 148px;"></div>
       </div>
@@ -574,11 +603,11 @@
       <span class="pill beam"><span class="pdot"></span>Source, plugin, releases</span>
     </div>
     <h2 class="reveal" style="font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.03em; font-weight: 700; margin: 0 0 12px; max-width: 640px; color: var(--text);">Read it, run it, fix it.</h2>
-    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 560px; margin: 0 0 40px;">Install notes, Quick Look registration, shortcuts, and the doctor command for broken previews.</p>
+    <p class="reveal" style="font-size: 15px; color: var(--body); line-height: 1.6; max-width: 620px; margin: 0 0 40px;">Install notes, platform guides, target-aware drag and drop, molecule collections, local xTB and CREST workflows, and recovery steps.</p>
 
     <div class="docs-grid" style="display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; align-items: stretch;">
       <!-- doc links -->
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+      <div class="doc-links-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
         <a class="doc-card reveal spot" href="/docs/get-started/install" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="getting-started" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">01</div>
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Getting started</div>
@@ -602,6 +631,18 @@
           <div style="font-size: 16px; font-weight: 600; color: var(--text);">Codex plugin &amp; MCP</div>
           <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install the local plugin and review its typed molecular tool surface.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Plugin guide <span class="doc-arrow">→</span></span>
+        </a>
+        <a class="doc-card reveal spot" href="/docs/workflows/drag-and-drop" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="drag-and-drop" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">05</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">Drag &amp; collections</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Route drops by target, then append, merge, edit, and export molecular collections safely.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Workflow guide <span class="doc-arrow">→</span></span>
+        </a>
+        <a class="doc-card reveal spot" href="/docs/workflows/xtb" data-analytics-event="Docs Link" data-analytics-location="docs" data-analytics-target="xtb-crest" style="border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 22px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent);">06</div>
+          <div style="font-size: 16px; font-weight: 600; color: var(--text);">xTB &amp; CREST</div>
+          <p style="font-size: 13px; color: var(--muted); line-height: 1.55; margin: 0; flex: 1;">Install local engines, configure bounded jobs, and review reports, ensembles, and recovery artifacts.</p>
+          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Calculation guide <span class="doc-arrow">→</span></span>
         </a>
       </div>
       <!-- shortcuts panel -->
@@ -739,6 +780,10 @@ class Component extends DCLogic {
 
   initVideos() {
     const vids = [...document.querySelectorAll("video")];
+    if (this.reduced) {
+      vids.forEach(v => { v.autoplay = false; v.pause(); v.controls = true; });
+      return;
+    }
     const kick = () => vids.forEach(v => {
       v.muted = true; v.loop = true; v.playsInline = true;
       const p = v.play();
@@ -752,11 +797,6 @@ class Component extends DCLogic {
     this._onVis = () => { if (!document.hidden) kick(); };
     document.addEventListener("visibilitychange", this._onVis);
     window.addEventListener("focus", this._onVis);
-    // if a video ever ends or stalls, restart it
-    vids.forEach(v => {
-      v.addEventListener("ended", () => { v.currentTime = 0; v.play().catch(() => {}); });
-      v.addEventListener("pause", () => { if (!document.hidden) v.play().catch(() => {}); });
-    });
   }
   componentDidUpdate() { this.applyTweaks(); }
 
@@ -811,6 +851,7 @@ class Component extends DCLogic {
     const el = document.getElementById("rot-word");
     if (!el) return;
     const words = ["PDB", "CIF", "SDF", "XYZ", "CUBE", "MOL2", "GRO"];
+    if (this.reduced) { el.textContent = words[0]; return; }
     let i = 0;
     el.style.display = "inline-block";
     const tick = () => {
@@ -905,17 +946,49 @@ class Component extends DCLogic {
   initZoom() {
     const lb = document.getElementById("lightbox");
     const img = document.getElementById("lightbox-img");
-    if (!lb || !img) return;
-    document.addEventListener("click", (e) => {
+    const closeButton = document.getElementById("lightbox-close");
+    if (!lb || !img || !closeButton) return;
+    document.querySelectorAll(".zoomable").forEach((zoomable) => {
+      zoomable.setAttribute("role", "button");
+      zoomable.setAttribute("tabindex", "0");
+      zoomable.setAttribute("aria-label", `${zoomable.alt || "Image"}. Open larger preview`);
+    });
+    const open = (zoomable) => {
+      this._lastLightboxFocus = document.activeElement;
+      img.src = zoomable.currentSrc || zoomable.src;
+      img.alt = zoomable.alt || "";
+      lb.classList.add("open");
+      lb.setAttribute("aria-hidden", "false");
+      window.requestAnimationFrame(() => closeButton.focus());
+    };
+    const close = () => {
+      if (!lb.classList.contains("open")) return;
+      lb.classList.remove("open");
+      lb.setAttribute("aria-hidden", "true");
+      img.removeAttribute("src");
+      if (this._lastLightboxFocus && this._lastLightboxFocus.focus) this._lastLightboxFocus.focus();
+    };
+    this._lightboxClick = (e) => {
       const z = e.target.closest && e.target.closest(".zoomable");
       if (z && z.offsetParent !== null) {
-        img.src = z.currentSrc || z.src;
-        img.alt = z.alt || "";
-        lb.classList.add("open");
+        open(z);
+        return;
       }
-    });
-    lb.addEventListener("click", () => lb.classList.remove("open"));
-    document.addEventListener("keydown", (e) => { if (e.key === "Escape") lb.classList.remove("open"); });
+      if (e.target === lb || e.target === closeButton) close();
+    };
+    this._lightboxKey = (e) => {
+      if (e.key === "Tab" && lb.classList.contains("open")) {
+        e.preventDefault();
+        closeButton.focus();
+      } else if ((e.key === "Enter" || e.key === " ") && e.target?.classList?.contains("zoomable")) {
+        e.preventDefault();
+        open(e.target);
+      } else if (e.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("click", this._lightboxClick);
+    document.addEventListener("keydown", this._lightboxKey);
   }
 
   initParticles() {
@@ -1046,7 +1119,7 @@ class Component extends DCLogic {
       }
     };
     bootRDKit();
-    if (!RDKit) { let tries = 0; this._rdkitPoll = setInterval(() => { bootRDKit(); if (RDKit || ++tries > 40) clearInterval(this._rdkitPoll); }, 250); }
+    if (!RDKit && window.initRDKitModule) { let tries = 0; this._rdkitPoll = setInterval(() => { bootRDKit(); if (RDKit || ++tries > 40) clearInterval(this._rdkitPoll); }, 250); }
 
     const mouse = { x: -1e4, y: -1e4, on: false };
     host.addEventListener("pointermove", (e) => {
@@ -1154,6 +1227,9 @@ class Component extends DCLogic {
     clearInterval(this._rotTimer); clearTimeout(this._typeTimer); clearTimeout(this._ct);
     clearInterval(this._rdkitPoll); clearInterval(this._vidTimer); clearInterval(this._tickPoll);
     clearTimeout(this._resizeRetry); if (this._ro) this._ro.disconnect();
+    if (this._onVis) { document.removeEventListener("visibilitychange", this._onVis); window.removeEventListener("focus", this._onVis); }
+    if (this._lightboxClick) document.removeEventListener("click", this._lightboxClick);
+    if (this._lightboxKey) document.removeEventListener("keydown", this._lightboxKey);
     cancelAnimationFrame(this._raf);
   }
 
