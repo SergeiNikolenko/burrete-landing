@@ -9,7 +9,7 @@ export const metadata = {
     template: "%s | Burrete Docs",
   },
   description:
-    "Documentation for Burrete, a macOS molecular file workspace with Finder Quick Look previews and a local Codex MCP plugin.",
+    "Documentation for Burrete across macOS, Finder Quick Look, the source-built iPhone app, and the local Codex MCP plugin.",
 };
 
 export default async function RootLayout({ children }) {
@@ -28,7 +28,7 @@ export default async function RootLayout({ children }) {
         <Layout
           navbar={navbar}
           pageMap={await getPageMap("/docs")}
-          docsRepositoryBase="https://github.com/SergeiNikolenko/Burrete/tree/main"
+          docsRepositoryBase="https://github.com/SergeiNikolenko/burrete-landing/tree/main"
           editLink="Edit this page on GitHub"
           feedback={{
             content: "Report a docs issue",

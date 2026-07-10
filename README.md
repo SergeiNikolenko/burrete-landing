@@ -15,12 +15,25 @@ when the project plan supports custom events.
 The public site also serves `/privacy`, `/terms`, `/robots.txt`, and
 `/sitemap.xml`. Keep their canonical URLs aligned with the production domain.
 
-## Local Preview
+## Local development
 
 ```sh
-python3 -m http.server 8912 --bind 127.0.0.1
+npm ci
+npm run dev
 ```
 
-Then open `http://127.0.0.1:8912/`.
+Then open `http://localhost:3000/`. The root landing page, documentation under
+`/docs`, download redirect, and outbound redirect pages all run through Next.js;
+serving the repository root as static files does not expose assets from `public/`
+or the application routes correctly.
 
-Use `vercel dev` when testing the `/download` serverless route locally.
+Before opening a pull request, run:
+
+```sh
+npm test
+npm run build
+npm audit --omit=dev
+```
+
+The site check validates internal documentation routes, fragment links, local
+assets, duplicate IDs, and image alternative text.

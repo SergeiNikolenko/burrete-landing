@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
+  <title id="title">CREST conformer generation and optional PRISM pruning</title>
+  <desc id="desc">A small molecule or selected object runs through CREST to generate an ensemble. Burrete reviews the output and may send an existing XYZ or SDF ensemble to optional PRISM pruning. xTB pre-optimization is a recovery path.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0l10 5-10 5z" fill="#0f8f72"/></marker>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f8fbfa"/><stop offset="1" stop-color="#edf7f3"/></linearGradient>
+    <style>.h{font:700 28px system-ui,sans-serif;fill:#101513}.t{font:650 18px system-ui,sans-serif;fill:#17201d}.s{font:400 14px system-ui,sans-serif;fill:#5f6b67}.card{fill:#fff;stroke:#cadbd5;stroke-width:2}.active{fill:#e2f4ee;stroke:#0f8f72;stroke-width:2}.warn{fill:#fff7e8;stroke:#d39b3c;stroke-width:2}.a{fill:none;stroke:#0f8f72;stroke-width:3;marker-end:url(#arrow)}.recover{fill:none;stroke:#d39b3c;stroke-width:2.5;stroke-dasharray:7 7;marker-end:url(#arrow)}</style>
+  </defs>
+  <rect width="1200" height="560" rx="28" fill="url(#bg)"/>
+  <text x="60" y="62" class="h">Generation and pruning are separate stages</text>
+  <g transform="translate(55 155)"><rect class="card" width="205" height="150" rx="20"/><text x="103" y="42" text-anchor="middle" class="t">Small molecule</text><text x="103" y="76" text-anchor="middle" class="s">file or Mol* selection</text><text x="103" y="103" text-anchor="middle" class="s">charge · spin · solvent</text><text x="103" y="130" text-anchor="middle" class="s">≤ 300 detected atoms</text></g>
+  <path class="a" d="M260 230H350"/>
+  <g transform="translate(350 125)"><rect class="active" width="220" height="210" rx="22"/><text x="110" y="45" text-anchor="middle" class="t">CREST Generate</text><text x="110" y="80" text-anchor="middle" class="s">GFN method</text><text x="110" y="108" text-anchor="middle" class="s">sampling preset</text><text x="110" y="136" text-anchor="middle" class="s">energy window · RMSD</text><text x="110" y="164" text-anchor="middle" class="s">cancellable local job</text><text x="110" y="193" text-anchor="middle" class="s">crest_run_N</text></g>
+  <path class="a" d="M570 230H660"/>
+  <g transform="translate(660 125)"><rect class="card" width="220" height="210" rx="22"/><text x="110" y="45" text-anchor="middle" class="t">Ensemble review</text><text x="110" y="80" text-anchor="middle" class="s">XYZ or SDF conformers</text><text x="110" y="108" text-anchor="middle" class="s">energies · clusters · flags</text><text x="110" y="136" text-anchor="middle" class="s">report · log · exit state</text><text x="110" y="164" text-anchor="middle" class="s">inspect before handoff</text><text x="110" y="193" text-anchor="middle" class="s">recovery stays labeled</text></g>
+  <path class="a" d="M880 230H965"/>
+  <g transform="translate(965 125)"><rect class="active" width="180" height="210" rx="22"/><text x="90" y="45" text-anchor="middle" class="t">PRISM</text><text x="90" y="78" text-anchor="middle" class="s">optional pruning</text><text x="90" y="106" text-anchor="middle" class="s">existing XYZ / SDF</text><text x="90" y="134" text-anchor="middle" class="s">energy sort</text><text x="90" y="162" text-anchor="middle" class="s">prism_run_N</text><text x="90" y="190" text-anchor="middle" class="s">review again</text></g>
+
+  <g transform="translate(335 390)"><rect class="warn" width="250" height="94" rx="18"/><text x="125" y="35" text-anchor="middle" class="t">Recovery only</text><text x="125" y="61" text-anchor="middle" class="s">xTB pre-optimization</text><text x="125" y="81" text-anchor="middle" class="s">or qualified GFN-FF retry</text></g>
+  <path class="recover" d="M460 390V345"/>
+  <text x="625" y="458" class="s">Recovered optimized structures are not complete conformer ensembles.</text>
+  <text x="625" y="486" class="s">Validate protonation, stereochemistry, energies, and settings before use.</text>
+</svg>

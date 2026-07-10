@@ -11,17 +11,20 @@ The checked-in source of truth for format routing is `config/preview-formats.jso
 
 | Path | Formats | Notes |
 | --- | --- | --- |
-| Mol* interactive 3D | PDB, ENT, PDBQT, PQR, CIF, MMCIF, MCIF, BCIF, MMTF, SDF, SD, MOL, MOL2, XYZ, GRO | Default path for most structure files. XYZ can also use `xyzrender`. |
+| Mol* interactive 3D | PDB, ENT, PDBQT, PQR, XPDB, CIF, MMCIF, MCIF, BCIF, MMTF, SDF, SD, MOL, MOL2, XYZ, GRO, MVSJ, MVSX | Main interactive path for directly supported structures and MolViewSpec scenes. SDF can also use a collection grid; several text structures can switch or fall back to `xyzrender`. |
 | RDKit molecule grids | SDF, SD, SMILES, SMI, CSV, TSV | Collection view with search, sorting, SMARTS filtering and highlighting, selection, append and merge, and export. |
-| External xyzrender | XYZ, CUB, CUBE, ABI, COM, FDF, IN, INP, LOG, NW, OUT, PSI4, QCIN, VASP, MAE, MAE.GZ, MAEGZ, CMS | Requires a local `xyzrender` executable. |
-| Molecular dynamics and topology | XTC, TRR, DCD, NCTRAJ, LAMMPSTRJ, TOP, PSF, PRMTOP | Registered as molecular files and routed to Mol* where supported by the runtime. |
-| OpenMM coordinate artifacts | XML, INPCRD, RST7, CRD, RST, STATE | Render as structures when standalone coordinates are present. |
-| OpenMM workflow artifacts | PAR, PRM, RTF, STR, KEY, CHK, CHECKPOINT | Open as text or workflow artifacts. Binary checkpoints show metadata. |
-| FEP network workspace | GraphML | Opens a ligand network preview workspace rather than a standard molecule preview. |
+| Coordinate conversion and xyzrender | ABI, COM, CUB, CUBE, FDF, FHIAIMS, GMS, IN, INP, LOG, NW, OUT, PSI4, QCIN, VASP, XYZR | Burrete tries its coordinate conversion path for an interactive preview and can use the optional local `xyzrender` executable as a fallback or artwork renderer. |
+| Molecular dynamics and topology | XTC, TRR, DCD, NCTRAJ, TNG, H5MD, GSD, TRZ, LAMMPSTRJ, MDCRD, NC/NetCDF, TOP, PSF, PRMTOP, TPR, and related registered extensions | Trajectories often require compatible coordinate/topology partners. Registration does not imply that every artifact is meaningful as a standalone structure. |
+| Schrodinger structures | MAE, MAE.GZ, MAEGZ, CMS | Uses the Maestro conversion path for Mol* where possible, with explicit staged entries and an external-renderer fallback. |
+| OpenMM coordinate artifacts | XML, INPCRD, RST7, RESTRT, CRD, RST, STATE | Render as structures when standalone coordinates can be extracted; otherwise remain inspectable workflow artifacts. |
+| Workflow text and metadata | PAR, PRM, RTF, STR, KEY, CHK, CHECKPOINT, DMS, XVG, EDR, FASTA, FDEF, MSJ | Open as text or metadata rather than pretending every workflow file is a coordinate structure. |
+| FEP network workspace | GraphML, EDGE | Opens a ligand network preview workspace rather than a standard molecule preview. |
+| Pharmacophore | PH4 | Converts the pharmacophore model into a previewable Mol* representation. |
+| Spectra | MS, MAGMA, MGF, MSP, MZML, MZXML | Opens the dedicated spectrum surface. |
 
 ## Size limits
 
-Quick Look has per-format size limits in the format registry. The desktop workspace can expose richer surfaces for larger or more complex files, but very large files may still require format-specific handling.
+Quick Look has per-format size limits in the format registry. The desktop workspace can expose richer surfaces for larger or more complex files, but very large files may still require format-specific handling. Binary trajectories and paired topology/coordinate inputs need surface-specific testing; a registered document type alone is not proof of successful decoding on every platform.
 
 ## Updating support
 
