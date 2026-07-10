@@ -9,7 +9,7 @@ export const metadata = {
     template: "%s | Burrete Docs",
   },
   description:
-    "Documentation for Burrete across macOS, Finder Quick Look, the source-built iPhone app, and the local Codex MCP plugin.",
+    "Documentation for Burrete across macOS, Finder Quick Look, iPhone, the public molecular plugin, and typed MCP tools.",
 };
 
 export default async function RootLayout({ children }) {
@@ -40,7 +40,7 @@ export default async function RootLayout({ children }) {
             <Footer>
               <span>
                 Burrete is released under the MIT License. ·{" "}
-                <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
+                <a href="/support">Support</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
               </span>
             </Footer>
           }
