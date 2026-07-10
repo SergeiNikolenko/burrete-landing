@@ -21,12 +21,19 @@ Use the grid when you need search, sorting, SMARTS filtering and highlighting, r
 
 ## External xyzrender
 
-`xyzrender` is an optional local executable used for external-renderer formats and artwork-style SVG rendering.
+`xyzrender` is an optional local executable used for artwork-style SVG rendering and format-specific fallback previews.
 
-It is used by default for single-frame XYZ where appropriate and required for external-renderer-only formats such as CUB, CUBE, ABI, COM, FDF, IN, INP, LOG, NW, OUT, PSI4, QCIN, VASP, MAE, MAE.GZ, MAEGZ, and CMS.
+XYZ and several quantum-chemistry inputs can use `xyzrender` when the active renderer policy selects it. Burrete also has coordinate-conversion paths for ABI, COM, CUB/CUBE, FDF, FHIAIMS, GMS, IN/INP, LOG, NW/OUT, PSI4, QCIN, VASP, and XYZR, and a separate Maestro conversion path for MAE/MAEGZ/CMS. If conversion cannot produce coordinates, the external renderer remains the fallback rather than a silently fabricated structure.
 
 Multi-frame XYZ files stay in Mol* when Burrete detects trajectory content so the native trajectory controls can show the available frames.
 
 ## VESTA handoff
 
 CUBE, CIF, MMCIF, MCIF, XYZ, and external-renderer input previews expose an optional VESTA handoff when VESTA is installed.
+
+## Calculation engines are separate
+
+xTB, CREST, and PRISM are local calculation executables, not preview renderers. Burrete prepares bounded inputs, runs cancellable jobs, and opens reports and artifacts, while Mol*, RDKit, or the text viewer display their outputs.
+
+- [xTB calculations](/docs/workflows/xtb)
+- [CREST and PRISM](/docs/workflows/crest-prism)

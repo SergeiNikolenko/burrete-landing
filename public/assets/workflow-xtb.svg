@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Local xTB calculation workflow in Burrete</title>
+  <desc id="desc">A small structure or selected molecular object passes an atom-count guard and settings review, runs in a cancellable local xTB job, and produces reports, logs, and molecular artifacts.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0l10 5-10 5z" fill="#0f8f72"/></marker>
+    <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f8fbfa"/><stop offset="1" stop-color="#edf7f3"/></linearGradient>
+    <style>.h{font:700 28px system-ui,sans-serif;fill:#101513}.t{font:650 18px system-ui,sans-serif;fill:#17201d}.s{font:400 14px system-ui,sans-serif;fill:#5f6b67}.card{fill:#fff;stroke:#cadbd5;stroke-width:2}.active{fill:#e2f4ee;stroke:#0f8f72;stroke-width:2}.a{fill:none;stroke:#0f8f72;stroke-width:3;marker-end:url(#arrow)}.dash{fill:none;stroke:#91a59d;stroke-width:2;stroke-dasharray:6 7}</style>
+  </defs>
+  <rect width="1200" height="520" rx="28" fill="url(#bg)"/>
+  <text x="60" y="62" class="h">A local, inspectable calculation pipeline</text>
+  <g transform="translate(55 145)"><rect class="card" width="210" height="190" rx="20"/><text x="24" y="42" class="t">Molecular scope</text><text x="24" y="77" class="s">small file</text><text x="24" y="103" class="s">Mol* selected object</text><text x="24" y="129" class="s">Ketcher molecule</text><path d="M25 149h160" stroke="#d8e3df"/><text x="24" y="174" class="s">not a full macromolecule</text></g>
+  <path class="a" d="M265 240H355"/>
+  <g transform="translate(355 120)"><rect class="active" width="235" height="240" rx="22"/><text x="118" y="43" text-anchor="middle" class="t">Prepare &amp; guard</text><text x="118" y="77" text-anchor="middle" class="s">≤ 300 detected atoms</text><text x="118" y="104" text-anchor="middle" class="s">method · charge · UHF</text><text x="118" y="131" text-anchor="middle" class="s">solvent · properties · MD</text><text x="118" y="158" text-anchor="middle" class="s">timeout · saved run files</text><path d="M38 181h159" stroke="#a7d2c4"/><text x="118" y="210" text-anchor="middle" class="s">exact request stays visible</text></g>
+  <path class="a" d="M590 240H680"/>
+  <g transform="translate(680 145)"><rect class="card" width="210" height="190" rx="20"/><text x="105" y="42" text-anchor="middle" class="t">Local xTB job</text><text x="105" y="77" text-anchor="middle" class="s">discovered executable</text><text x="105" y="105" text-anchor="middle" class="s">numbered work folder</text><text x="105" y="133" text-anchor="middle" class="s">live Jobs state</text><rect x="54" y="151" width="102" height="27" rx="13" fill="#edf3f1"/><text x="105" y="170" text-anchor="middle" class="s">cancellable</text></g>
+  <path class="a" d="M890 240H980"/>
+  <g transform="translate(980 120)"><rect class="active" width="165" height="240" rx="22"/><text x="82" y="43" text-anchor="middle" class="t">Review</text><text x="82" y="80" text-anchor="middle" class="s">report</text><text x="82" y="108" text-anchor="middle" class="s">log</text><text x="82" y="136" text-anchor="middle" class="s">exit state</text><text x="82" y="164" text-anchor="middle" class="s">artifacts</text><text x="82" y="192" text-anchor="middle" class="s">trajectory</text><text x="82" y="220" text-anchor="middle" class="s">comparison</text></g>
+  <path class="dash" d="M785 335v85H470v-55"/>
+  <text x="630" y="447" text-anchor="middle" class="s">Settings and a previous result can be reviewed before the next run.</text>
+</svg>

@@ -67,3 +67,15 @@ bun run install:plugin
 ```
 
 Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. See [Codex Plugin and MCP](/docs/plugin) for the tool surface, security boundaries, and source links.
+
+## Optional local calculation engines
+
+The Burrete application does not bundle xTB, CREST, or PRISM. Install only the engines needed for your local workflow:
+
+```bash
+pixi global install xtb
+pixi global install crest
+uv tool install prism_pruner
+```
+
+Check each executable before a production calculation, then use the matching runtime check in the desktop inspector. See [xTB calculations](/docs/workflows/xtb) and [CREST and PRISM](/docs/workflows/crest-prism).
