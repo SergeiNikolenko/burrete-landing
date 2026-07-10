@@ -5,6 +5,8 @@ const URLS = [
   { path: "/docs", priority: "0.8", changefreq: "weekly" },
   { path: "/docs/get-started/install", priority: "0.7", changefreq: "monthly" },
   { path: "/docs/formats", priority: "0.7", changefreq: "monthly" },
+  { path: "/docs/plugin", priority: "0.7", changefreq: "monthly" },
+  { path: "/support", priority: "0.4", changefreq: "monthly" },
   { path: "/privacy", priority: "0.3", changefreq: "yearly" },
   { path: "/terms", priority: "0.3", changefreq: "yearly" },
 ];

@@ -1,15 +1,49 @@
 ---
-title: Codex Plugin and MCP
-description: Install Burrete as a local Codex plugin with focused workflow skills and typed MCP tools for molecular workspaces.
+title: Burrete Plugin and MCP
+description: Use the public Burrete molecular workspace through its hosted MCP endpoint, or install the local Codex plugin for desktop control.
 ---
 
-# Codex Plugin and MCP
+# Burrete Plugin and MCP
 
-Burrete includes a Codex-local plugin that connects Codex to the same molecular workspace used by the macOS app. It combines focused workflow skills with a typed local MCP server.
+Burrete has two complementary plugin surfaces:
 
-The plugin stays in the [main Burrete repository](https://github.com/SergeiNikolenko/Burrete). There is no separate plugin repository.
+- A public hosted plugin that opens supported molecular results directly in the real Burrete browser workspace.
+- A local Codex plugin that can open local files and control Burrete desktop or Browser sessions.
 
-## What Codex can do
+Both implementations live in the [main Burrete repository](https://github.com/SergeiNikolenko/Burrete). There is no separate plugin source repository.
+
+## Public hosted plugin
+
+The production MCP endpoint is:
+
+```text
+https://burrete-plugin.vercel.app/mcp
+```
+
+It exposes two read-only tools:
+
+```text
+preview_molecular_file
+preview_pdb_structure
+```
+
+`preview_molecular_file` accepts one ChatGPT-authorized PDB, ENT, PDBQT, CIF, mmCIF, SDF, SD, XYZ, or extended XYZ attachment. `preview_pdb_structure` retrieves one public RCSB Protein Data Bank entry by its four-character PDB ID.
+
+Each result returns bounded composition data and opens directly in the real Burrete workspace with its document tab, viewer toolbar, sequence and selection controls, measurements, representations, camera controls, and molecular inspector. The deployment root redirects back to this documentation; it is not a separate viewer product.
+
+The hosted plugin is deployed for testing and prepared for review. Public one-click installation becomes available only after OpenAI approves the listing and the publisher releases it in the Plugins Directory.
+
+### Hosted data boundary
+
+Attachments are fetched from the temporary HTTPS URL authorized by the OpenAI host, processed in memory, and limited to 3 MiB. The service does not save them to Burrete application storage. Raw molecular text is returned only to the sandboxed Burrete workspace through result metadata; the model receives a bounded summary.
+
+Do not send credentials, protected health information, export-controlled structures, or confidential molecular files unless your OpenAI workspace policy and organization explicitly permit that processing. See the [Privacy Policy](/privacy) for recipients, retention, and user controls.
+
+## Local Codex workspace plugin
+
+The local plugin connects Codex to the same molecular workspace used by the macOS app. It combines focused workflow skills with a typed local stdio MCP server.
+
+### What local Codex can do
 
 - Open molecular structures, SDF collections, trajectories, and result bundles.
 - Observe the active document, tabs, panels, viewer readiness, and Mol* scene state.
@@ -29,7 +63,7 @@ burrete.render_panel
 
 `burrete.open_workspace` returns a stable `workspaceSessionId`. Follow-up calls use that handle instead of carrying raw URLs or session-directory details through the conversation.
 
-## Install in Codex
+### Install the local plugin
 
 Clone the main repository and run its plugin installer:
 
@@ -41,9 +75,9 @@ bun run install:plugin
 
 Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. The installer stages the self-contained plugin in a dedicated local marketplace, registers that marketplace with Codex, and enables `burrete@burrete` through the Codex CLI. The MCP server is bundled, so the installed plugin does not depend on a separate `node_modules` directory.
 
-## Why it is local
+### Why the workspace bridge stays local
 
-Burrete needs user-selected local molecular files and local Browser or desktop sessions. A Codex-local plugin with a stdio MCP server matches that boundary; it is not presented as a hosted ChatGPT app.
+Desktop control needs user-selected local molecular files and local Browser or desktop sessions. A Codex-local plugin with a stdio MCP server matches that boundary, while the hosted plugin is intentionally limited to one authorized attachment or one public PDB entry.
 
 The MCP layer exposes purpose-built molecular operations. It does not provide arbitrary JavaScript or shell execution. Local HTTP surfaces are token-gated, payloads are bounded, and destructive overwrites or remote-job submission remain outside the plugin contract.
 
@@ -52,6 +86,7 @@ Browser development, the desktop app, tokenized preview, native Quick Look, and 
 ## Source and contracts
 
 - [Burrete repository](https://github.com/SergeiNikolenko/Burrete)
+- [Hosted plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/apps/burrete-public-plugin)
 - [Codex plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent)
 - [Plugin installation and architecture](https://github.com/SergeiNikolenko/Burrete/blob/main/plugins/burette-agent/README.md)
 - [Agent platform and MCP contract](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md)

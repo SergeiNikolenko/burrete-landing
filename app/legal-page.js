@@ -45,7 +45,7 @@ export function legalPage({ path, title, description, body }) {
   <p class="effective">Effective date: July 10, 2026</p>
   ${body}
 </main>
-<footer><div><span>Burrete is released under the MIT License.</span><span><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burrete">GitHub</a></span></div></footer>
+<footer><div><span>Burrete is released under the MIT License.</span><span><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burrete">GitHub</a></span></div></footer>
 </body>
 </html>`;
 }

@@ -7,29 +7,41 @@ export function GET() {
     legalPage({
       path: "/privacy",
       title: "Privacy Policy",
-      description: "How Burrete handles molecular files, local application data, website analytics, and network requests.",
+      description: "How Burrete handles molecular files in the public plugin, local application data, website analytics, and network requests.",
       body: `
-        <p>This policy covers the Burrete website, desktop application, Finder Quick Look extensions, and the Burrete plugin for Codex.</p>
+        <p>This policy covers the Burrete website, public molecular plugin and MCP service, desktop application, Finder Quick Look extensions, and local Codex plugin.</p>
 
         <h2>Local data processing</h2>
-        <p>Burrete is local-first software. Molecular files selected by the user are opened and processed on the user's device. Burrete does not upload molecular files to a Burrete-operated service and does not include developer-controlled analytics or advertising trackers in the application.</p>
-        <p>When the plugin is used through Codex, tool inputs, bounded tool results, and other content needed to answer the request may be processed by the Codex host under the user's OpenAI account and workspace policies. Users should not expose confidential molecular data to Codex unless their organization permits it.</p>
+        <p>The desktop app, Finder extensions, and local Codex workspace plugin are local-first. Molecular files selected for those surfaces are opened and processed on the user's device. They do not upload a file to the hosted Burrete MCP service unless the user separately invokes the public hosted plugin.</p>
+
+        <h2>Hosted molecular previews</h2>
+        <p>When a user invokes the public plugin with an attachment, the OpenAI host provides Burrete with a temporary HTTPS download URL, file identifier, filename, and MIME type authorized for that tool call. Burrete fetches up to 3 MiB, parses the molecular structure in memory, returns bounded composition data to the model, and returns raw molecular text only in result metadata used by the sandboxed Burrete workspace.</p>
+        <p>The hosted service does not write attachment contents, signed download URLs, or PDB files to Burrete application storage. File contents remain in server memory for the request and response lifecycle. The OpenAI host may retain the conversation, tool result, attachment, and associated metadata under the user's account, workspace, data-control, and retention settings.</p>
+        <p>For a PDB lookup, Burrete receives the requested four-character PDB ID and sends that ID to the RCSB Protein Data Bank. RCSB does not receive a user's attachment through this tool.</p>
+
+        <h2>Service providers and technical metadata</h2>
+        <p>OpenAI processes tool inputs and results so ChatGPT or Codex can run the plugin and display its workspace. Vercel hosts the Burrete MCP service and website and may process network and request metadata such as IP address, request time, route, browser or client type, approximate region, performance, and security events under its policies. RCSB processes public PDB lookup requests. Burrete does not sell personal information or molecular-file data.</p>
+        <p>Burrete does not intentionally configure application logs to record raw molecular content or temporary signed download URLs. Technical logs and security metadata are retained according to the applicable OpenAI and Vercel account settings and policies.</p>
 
         <h2>Website analytics</h2>
         <p>The Burrete website uses Vercel Web Analytics and Speed Insights to measure page views, download referrals, outbound-link activity, and site performance. These services may process technical request data such as browser type, approximate region, referring page, and network information under Vercel's privacy terms. Burrete does not use advertising trackers or sell website visitor data.</p>
 
         <h2>Network access</h2>
-        <p>Burrete may make network requests when the user asks it to fetch a public URL, retrieve a public structure, check for software updates, or download an update. Those requests are sent to the selected third-party service, such as GitHub or the RCSB Protein Data Bank, and are governed by that service's privacy terms.</p>
-        <p>The plugin's public-URL fetch tool blocks localhost, private-network, and link-local destinations and bounds the returned content. It does not provide a general-purpose network proxy.</p>
+        <p>Burrete may make network requests when the user asks it to retrieve an authorized attachment, fetch a public structure, check for software updates, or download an update. Those requests are sent to the selected service, such as OpenAI's attachment host, GitHub, or RCSB, and are governed by that service's privacy terms.</p>
+        <p>The hosted attachment tool requires HTTPS, revalidates redirects, pins requests to validated public addresses, blocks localhost and non-public destinations, and bounds downloaded content. It does not provide a general-purpose network proxy.</p>
 
         <h2>Local storage</h2>
         <p>Burrete may store local preferences, recent-file references, logs, preview caches, and short-lived agent session files on the user's device. Removing the application does not automatically remove every local preference or cache. Users can clear Burrete caches and diagnostics from the application settings or remove the corresponding local application data manually.</p>
 
         <h2>Sharing and retention</h2>
-        <p>Burrete does not sell personal information. The project maintainers do not receive local molecular files or agent session content unless a user explicitly shares those materials, for example in a support request. Public issue reports should not contain confidential structures, credentials, or private paths.</p>
+        <p>The project maintainers do not receive local molecular files or local agent session content unless a user explicitly shares those materials, for example in a support request. Hosted attachments are processed as described above and are not retained in Burrete application storage.</p>
+
+        <h2>User controls and sensitive data</h2>
+        <p>Users control whether to attach a molecular file, request a public PDB entry, keep or delete the host conversation, and use the local-only workspace plugin instead. Do not submit credentials, protected health information, export-controlled structures, or confidential molecular data unless the user's organization and OpenAI workspace policies explicitly permit that processing.</p>
+        <p>Public issues and support requests must not contain confidential structures, temporary signed URLs, credentials, private paths, or proprietary logs.</p>
 
         <h2>Contact</h2>
-        <p>For privacy questions, open a <a href="https://github.com/SergeiNikolenko/Burrete/security/advisories/new">private security advisory</a>. Use the <a href="https://github.com/SergeiNikolenko/Burrete/issues">project issue tracker</a> for non-sensitive questions.</p>
+        <p>For privacy or security questions, open a <a href="https://github.com/SergeiNikolenko/Burrete/security/advisories/new">private security advisory</a>. Use the <a href="/support">support page</a> for non-sensitive questions.</p>
       `,
     }),
     { headers: { "Content-Type": "text/html; charset=utf-8" } },
