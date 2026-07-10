@@ -38,7 +38,10 @@ export default async function RootLayout({ children }) {
           toc={{ title: "On this page" }}
           footer={
             <Footer>
-              <span>Burrete is released under the MIT License.</span>
+              <span>
+                Burrete is released under the MIT License. ·{" "}
+                <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
+              </span>
             </Footer>
           }
         >

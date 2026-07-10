@@ -12,6 +12,9 @@ redirecting to the external destination. The main page also emits Vercel custom
 events for download clicks, outbound clicks, brew-copy intent, and scroll depth
 when the project plan supports custom events.
 
+The public site also serves `/privacy`, `/terms`, `/robots.txt`, and
+`/sitemap.xml`. Keep their canonical URLs aligned with the production domain.
+
 ## Local Preview
 
 ```sh
