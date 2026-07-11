@@ -52,6 +52,29 @@ for (const file of sourceFiles) {
   }
 }
 
+const landingSource = await readFile(path.join(root, "index.html"), "utf8");
+const outboundLinks = attributeValues(landingSource, "href").filter((href) => href.startsWith("/out/"));
+const outboundRoute = path.join(root, "app", "out", "[target]", "route.js");
+if (outboundLinks.length > 0 && !(await exists(outboundRoute))) {
+  failures.push("index.html: outbound links have no /out/[target] route");
+}
+
+const navSource = landingSource.slice(
+  landingSource.indexOf("<!-- ============ NAV ============ -->"),
+  landingSource.indexOf("<!-- ============ HERO ============ -->"),
+);
+if (!navSource.includes('href="/out/github-repo?surface=nav"')) {
+  failures.push("index.html: primary navigation is missing the GitHub repository link");
+}
+
+const heroSource = landingSource.slice(
+  landingSource.indexOf("<!-- ============ HERO ============ -->"),
+  landingSource.indexOf("<!-- ============ FORMATS ============ -->"),
+);
+if (!heroSource.includes('href="/out/github-repo?surface=hero"')) {
+  failures.push("index.html: hero is missing the GitHub repository link");
+}
+
 if (failures.length > 0) {
   console.error("Site checks failed:\n" + failures.map((failure) => `- ${failure}`).join("\n"));
   process.exitCode = 1;
