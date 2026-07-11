@@ -4,6 +4,7 @@ import { getPageMap } from "nextra/page-map";
 import "nextra-theme-docs/style.css";
 
 export const metadata = {
+  authors: [{ name: "Sergei A. Nikolenko" }],
   title: {
     default: "Burrete Docs",
     template: "%s | Burrete Docs",
@@ -39,7 +40,7 @@ export default async function RootLayout({ children }) {
           footer={
             <Footer>
               <span>
-                Burrete is released under the MIT License. ·{" "}
+                Published by Sergei A. Nikolenko under the MIT License. ·{" "}
                 <a href="/support">Support</a> · <a href="/privacy">Privacy</a> · <a href="/terms">Terms</a>
               </span>
             </Footer>
