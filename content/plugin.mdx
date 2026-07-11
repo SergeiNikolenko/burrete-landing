@@ -31,6 +31,8 @@ preview_pdb_structure
 
 Each result returns bounded composition data and opens directly in the real Burrete workspace with its document tab, viewer toolbar, sequence and selection controls, measurements, representations, camera controls, and molecular inspector. The deployment root redirects back to this documentation; it is not a separate viewer product.
 
+The public domain is only the HTTPS host for `/mcp` and the widget's JavaScript and CSS. After the MCP server returns a tool result and UI template, ChatGPT renders the Burrete component inside an isolated iframe on the user's device, where WebGL and Mol* use that device's CPU and GPU. State belongs to that chat widget; there is no shared protein or shared Burrete workspace between users.
+
 The hosted plugin is deployed for testing and prepared for review. Public one-click installation becomes available only after OpenAI approves the listing and the publisher releases it in the Plugins Directory.
 
 ### Hosted data boundary
@@ -42,6 +44,8 @@ Do not send credentials, protected health information, export-controlled structu
 ## Local Codex workspace plugin
 
 The local plugin connects Codex to the same molecular workspace used by the macOS app. It combines focused workflow skills with a typed local stdio MCP server.
+
+This is the preferred path for local-first work on the same Mac: the plugin can open local files and control the installed Burrete app without routing that workspace through the public hosted service.
 
 ### What local Codex can do
 
