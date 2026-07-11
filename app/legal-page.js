@@ -8,6 +8,7 @@ export function legalPage({ path, title, description, body }) {
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${title} | Burrete</title>
 <meta name="description" content="${description}">
+<meta name="author" content="Sergei A. Nikolenko">
 <link rel="canonical" href="${SITE_URL}${path}">
 <meta property="og:title" content="${title} | Burrete">
 <meta property="og:description" content="${description}">
@@ -45,7 +46,7 @@ export function legalPage({ path, title, description, body }) {
   <p class="effective">Effective date: July 10, 2026</p>
   ${body}
 </main>
-<footer><div><span>Burrete is released under the MIT License.</span><span><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burrete">GitHub</a></span></div></footer>
+<footer><div><span>Published by Sergei A. Nikolenko under the MIT License.</span><span><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burrete">GitHub</a></span></div></footer>
 </body>
 </html>`;
 }
