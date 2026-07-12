@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <script src="./support.js"></script>
+<script src="/rdkit/RDKit_minimal.js"></script>
+<script>window.initRDKitModule = typeof initRDKitModule === "function" ? initRDKitModule : window.initRDKitModule;</script>
 <script>
   window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
   window.si = window.si || function () { (window.siq = window.siq || []).push(arguments); };
@@ -314,7 +316,7 @@
   <div id="top" style="position: relative; overflow: hidden; background: var(--hero-grad); border-bottom: 1px solid var(--border);">
     <div class="hero-clouds" aria-hidden="true"><div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div></div>
     <div style="position: absolute; inset: 0; opacity: var(--grid-op); background-image: linear-gradient(#ffffff08 1px, transparent 1px), linear-gradient(90deg, #ffffff08 1px, transparent 1px); background-size: 40px 40px; animation: gridpan 6s linear infinite; -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); mask-image: radial-gradient(ellipse 70% 60% at 50% 25%, #000 40%, transparent 78%); pointer-events: none;"></div>
-    <canvas id="particles" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .45;"></canvas>
+    <canvas id="particles" data-depiction-source="loading" style="position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; opacity: .78;"></canvas>
 
     <div class="hero-pad" style="position: relative; z-index: 2; max-width: 1000px; margin: 0 auto; padding: 92px 32px 56px; text-align: center;">
       <div style="font-family: 'Geist Mono', monospace; font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--mono); margin-bottom: 26px; display: inline-flex; align-items: center; gap: 8px;">
@@ -997,50 +999,10 @@ class Component extends DCLogic {
     if (!cv || this.reduced) return;
     const host = cv.parentElement;
     const ctx = cv.getContext("2d");
-    let w, h, dpr, bondCol = "rgba(20,20,25,.18)", bg = "#fff", accent = "#0f8f72";
-
-    // --- RDKit-style 2D skeletal templates (unit coords, ~1.0 bond length) ---
-    // el: undefined => carbon (no label). bonds: [i, j, order]
-    const R3 = Math.sqrt(3) / 2;
-    const hex = [[1,0],[.5,R3],[-.5,R3],[-1,0],[-.5,-R3],[.5,-R3]];
-    const TEMPLATES = [
-      { // benzene
-        atoms: hex.map(p => ({ x: p[0], y: p[1] })),
-        bonds: [[0,1,2],[1,2,1],[2,3,2],[3,4,1],[4,5,2],[5,0,1]]
-      },
-      { // pyridine (N at 0)
-        atoms: hex.map((p,i) => ({ x: p[0], y: p[1], el: i === 0 ? "N" : undefined })),
-        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2]]
-      },
-      { // cyclohexanol
-        atoms: [...hex.map(p => ({ x: p[0], y: p[1] })), { x: 1.9, y: 0, el: "O" }],
-        bonds: [[0,1,1],[1,2,1],[2,3,1],[3,4,1],[4,5,1],[5,0,1],[0,6,1]]
-      },
-      { // amide  C-C(=O)-N
-        atoms: [{ x: -1, y: .35 }, { x: 0, y: 0 }, { x: 0, y: 1, el: "O" }, { x: .92, y: -.5, el: "N" }, { x: 1.9, y: -.1 }],
-        bonds: [[0,1,1],[1,2,2],[1,3,1],[3,4,1]]
-      },
-      { // naphthalene (fused bicyclic)
-        atoms: [
-          { x: 0, y: .5 }, { x: 0, y: -.5 }, { x: -R3*2, y: -1 }, { x: -R3*4, y: -.5 },
-          { x: -R3*4, y: .5 }, { x: -R3*2, y: 1 }, { x: R3*2, y: -1 }, { x: R3*4, y: -.5 },
-          { x: R3*4, y: .5 }, { x: R3*2, y: 1 }
-        ],
-        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,5,1],[5,0,2],[1,6,1],[6,7,2],[7,8,1],[8,9,2],[9,0,1]]
-      },
-      { // furan-ish 5-ring with O
-        atoms: [{ x: 0, y: 1, el: "O" }, { x: .95, y: .31 }, { x: .59, y: -.81 }, { x: -.59, y: -.81 }, { x: -.95, y: .31 }],
-        bonds: [[0,1,1],[1,2,2],[2,3,1],[3,4,2],[4,0,1]]
-      }
-    ];
-    const HETCOL = { O: "rgba(224,72,64,", N: "rgba(64,104,224,", S: "rgba(214,168,40," };
+    let w, h, dpr, dark = false;
 
     const readColors = () => {
-      const cs = getComputedStyle(document.documentElement);
-      accent = (cs.getPropertyValue("--accent").trim()) || accent;
-      bg = (cs.getPropertyValue("--bg").trim()) || bg;
-      const dark = document.documentElement.getAttribute("data-theme") === "dark";
-      bondCol = dark ? "rgba(210,214,220," : "rgba(24,26,32,";
+      dark = document.documentElement.getAttribute("data-theme") === "dark";
     };
     this._particleColors = readColors;
 
@@ -1066,25 +1028,26 @@ class Component extends DCLogic {
       "CC(C)Cc1ccc(cc1)C(C)C(=O)O",          // ibuprofen
       "OCC1OC(O)C(O)C(O)C1O",                // glucose
       "NCCc1ccc(O)c(O)c1",                   // dopamine
+      "CC(=O)NC1=CC=C(O)C=C1",               // paracetamol
+      "CN1CCC[C@H]1c2cccnc2",                // nicotine
+      "NCCc1c[nH]c2ccc(O)cc12",              // serotonin
       "c1ccc2ccccc2c1",                      // naphthalene
       "c1ccncc1",                            // pyridine
       "c1ccccc1"                             // benzene
     ];
     const mols = [];
-    const UNIT = 30; // uniform molecule size
-    const COUNT = Math.max(14, Math.min(30, Math.round((w * h) / 90000)));
+    const COUNT = Math.max(12, Math.min(22, Math.round((w * h) / 105000)));
     for (let i = 0; i < COUNT; i++) {
-      const t = TEMPLATES[(Math.random() * TEMPLATES.length) | 0];
       mols.push({
-        t, smi: SMILES[(Math.random() * SMILES.length) | 0], spr: null,
+        smi: SMILES[(Math.random() * SMILES.length) | 0], spr: null,
         x: Math.random() * w, y: Math.random() * h,
-        vx: (Math.random() - .5) * .06, vy: (Math.random() - .5) * .06,
-        a: Math.random() * 6.283, va: (Math.random() - .5) * .0012,
-        s: UNIT
+        vx: (Math.random() - .5) * .22, vy: (Math.random() - .5) * .16,
+        a: (Math.random() - .5) * .35, va: (Math.random() - .5) * .0007,
+        scale: .78 + Math.random() * .5
       });
     }
 
-    // --- RDKit → molecular sprites (progressive; vector template is the fallback) ---
+    // RDKit is the only depiction source. The canvas stays empty until WASM is ready.
     let RDKit = window.__rdkit || null;
     const spriteCache = new Map();
     let bondHex = "#14161c";
@@ -1100,11 +1063,11 @@ class Component extends DCLogic {
       let mol; try { mol = RDKit.get_mol(smi); } catch (e) { return null; }
       if (!mol) return null;
       let svg;
-      try { svg = mol.get_svg(230, 230); } catch (e) { mol.delete(); return null; }
+      try { svg = mol.get_svg(280, 200); } catch (e) { mol.delete(); return null; }
       mol.delete();
       svg = svg.replace(/<rect[^>]*\/>/g, "").replace(/<rect[^>]*>\s*<\/rect>/g, "");
       svg = svg.replace(/#000000/gi, bondHex).replace(/stroke:\s*#000\b/gi, "stroke:" + bondHex);
-      const spr = { img: new Image(), ready: false };
+      const spr = { img: new Image(), ready: false, width: 280, height: 200 };
       spr.img.onload = () => { spr.ready = true; };
       spr.img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
       spriteCache.set(key, spr);
@@ -1116,7 +1079,23 @@ class Component extends DCLogic {
     const bootRDKit = () => {
       if (RDKit) { rebuildSprites(); return; }
       if (window.initRDKitModule) {
-        try { window.initRDKitModule().then(mod => { RDKit = mod; window.__rdkit = mod; readBondHex(); rebuildSprites(); }).catch(() => {}); } catch (e) {}
+        try {
+          window.initRDKitModule({ locateFile: () => "/rdkit/RDKit_minimal.wasm" })
+            .then(mod => {
+              RDKit = mod;
+              window.__rdkit = mod;
+              cv.dataset.depictionSource = "rdkit";
+              readBondHex();
+              rebuildSprites();
+            })
+            .catch(error => {
+              cv.dataset.depictionSource = "error";
+              console.warn("RDKit background failed to initialize", error);
+            });
+        } catch (error) {
+          cv.dataset.depictionSource = "error";
+          console.warn("RDKit background failed to initialize", error);
+        }
       }
     };
     bootRDKit();
@@ -1130,60 +1109,17 @@ class Component extends DCLogic {
     host.addEventListener("pointerleave", () => { mouse.on = false; mouse.x = mouse.y = -1e4; });
 
     const drawMol = (m) => {
-      const near = false, strength = 0;
-      if (m.spr && m.spr.ready) {
-        const dsz = m.s * 5.2;
-        ctx.save();
-        ctx.translate(m.x, m.y); ctx.rotate(m.a);
-        ctx.globalAlpha = 0.4;
-        ctx.drawImage(m.spr.img, -dsz / 2, -dsz / 2, dsz, dsz);
-        ctx.restore();
-        ctx.globalAlpha = 1;
-        return;
-      }
-      const cos = Math.cos(m.a), sin = Math.sin(m.a);
-      const P = m.t.atoms.map(at => ({
-        x: m.x + (at.x * cos - at.y * sin) * m.s,
-        y: m.y + (at.x * sin + at.y * cos) * m.s,
-        el: at.el
-      }));
-      const col = near ? accent + "," : bondCol;
-      const baseA = near ? 0.28 + strength * 0.5 : 0.26;
-      ctx.lineWidth = 1.15; ctx.lineCap = "round";
-      const pad = m.s * 0.32;
-      for (const [i, j, order] of m.t.bonds) {
-        let a = P[i], b = P[j];
-        let ax = a.x, ay = a.y, bx = b.x, by = b.y;
-        const dx = bx - ax, dy = by - ay, len = Math.hypot(dx, dy) || 1;
-        const ux = dx / len, uy = dy / len;
-        if (a.el) { ax += ux * pad; ay += uy * pad; }
-        if (b.el) { bx -= ux * pad; by -= uy * pad; }
-        ctx.strokeStyle = col + baseA + ")";
-        if (order === 2) {
-          const ox = -uy * 2.2, oy = ux * 2.2;
-          ctx.beginPath(); ctx.moveTo(ax + ox, ay + oy); ctx.lineTo(bx + ox, by + oy); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(ax - ox, ay - oy); ctx.lineTo(bx - ox, by - oy); ctx.stroke();
-        } else {
-          ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
-        }
-      }
-      // heteroatom labels
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.font = "600 " + (m.s * 0.62).toFixed(0) + "px 'Geist Mono', monospace";
-      for (const p of P) {
-        if (!p.el) continue;
-        ctx.globalAlpha = 1; ctx.fillStyle = bg;
-        ctx.beginPath(); ctx.arc(p.x, p.y, m.s * 0.34, 0, 6.283); ctx.fill();
-        ctx.globalAlpha = near ? 0.55 + strength * 0.45 : 0.5;
-        ctx.fillStyle = (HETCOL[p.el] || "rgba(120,120,120,") + "1)";
-        ctx.fillText(p.el, p.x, p.y + 0.5);
-      }
-      ctx.globalAlpha = 1;
+      if (!m.spr || !m.spr.ready) return;
+      const width = m.spr.width * m.scale;
+      const height = m.spr.height * m.scale;
+      const behindHeroCopy = m.x > w * .16 && m.x < w * .84 && m.y > 70 && m.y < Math.min(610, h * .58);
+      ctx.save();
+      ctx.translate(m.x, m.y);
+      ctx.rotate(m.a);
+      ctx.globalAlpha = (dark ? .72 : .62) * (behindHeroCopy ? .24 : 1);
+      ctx.drawImage(m.spr.img, -width / 2, -height / 2, width, height);
+      ctx.restore();
     };
-
-    const RM = 175;       // mouse repulsion radius
-    const LINKD = 235;     // inter-molecular link distance
-    const radOf = (m) => m.s * 1.9;
 
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
@@ -1191,29 +1127,20 @@ class Component extends DCLogic {
       // ---- physics (background only: calm, steady drift) ----
       for (const m of mols) {
         m.x += m.vx; m.y += m.vy; m.a += m.va;
-        const marg = m.s * 3.5;
-        if (m.x < -marg) m.x = w + marg; if (m.x > w + marg) m.x = -marg;
-        if (m.y < -marg) m.y = h + marg; if (m.y > h + marg) m.y = -marg;
-      }
-
-      // ---- inter-molecular links (dashed, faint) ----
-      ctx.save();
-      ctx.setLineDash([1.5, 5]);
-      ctx.lineWidth = 1;
-      for (let i = 0; i < mols.length; i++) {
-        for (let j = i + 1; j < mols.length; j++) {
-          const a = mols[i], b = mols[j];
-          const dx = b.x - a.x, dy = b.y - a.y, d = Math.hypot(dx, dy);
-          if (d < LINKD) {
-            const ux = dx / d, uy = dy / d;
-            const ax = a.x + ux * radOf(a) * 0.5, ay = a.y + uy * radOf(a) * 0.5;
-            const bx = b.x - ux * radOf(b) * 0.5, by = b.y - uy * radOf(b) * 0.5;
-            ctx.strokeStyle = bondCol + ((1 - d / LINKD) * 0.22).toFixed(3) + ")";
-            ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+        const margin = 170 * m.scale;
+        if (m.x < -margin) m.x = w + margin;
+        if (m.x > w + margin) m.x = -margin;
+        if (m.y < -margin) m.y = h + margin;
+        if (m.y > h + margin) m.y = -margin;
+        if (mouse.on) {
+          const dx = m.x - mouse.x, dy = m.y - mouse.y;
+          const distance = Math.hypot(dx, dy);
+          if (distance > 0 && distance < 180) {
+            m.x += (dx / distance) * 0.28;
+            m.y += (dy / distance) * 0.28;
           }
         }
       }
-      ctx.restore();
 
       // ---- molecules ----
       for (const m of mols) drawMol(m);
