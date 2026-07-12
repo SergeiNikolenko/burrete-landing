@@ -8,6 +8,6 @@ const withNextra = nextra({
 export default withNextra({
   reactStrictMode: true,
   outputFileTracingIncludes: {
-    "/*": ["./index.html", "./demo.html", "./download.html", "./out.html"],
+    "/*": ["./index.html", "./download.html", "./out.html"],
   },
 });

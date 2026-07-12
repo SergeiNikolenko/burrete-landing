@@ -6,7 +6,7 @@ const contentRoot = path.join(root, "content");
 const failures = [];
 
 const contentFiles = await walk(contentRoot, (file) => file.endsWith(".mdx"));
-const staticPages = [path.join(root, "index.html"), path.join(root, "demo.html")];
+const staticPages = [path.join(root, "index.html")];
 const sourceFiles = [...staticPages, ...contentFiles];
 
 for (const file of sourceFiles) {
