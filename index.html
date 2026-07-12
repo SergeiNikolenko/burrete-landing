@@ -94,6 +94,12 @@
 <meta name="twitter:image" content="https://burrete-landing.vercel.app/assets/burrete-quicklook.png">
 <link rel="canonical" href="https://burrete-landing.vercel.app/">
 <meta name="theme-color" content="#0a0a0a">
+<script>
+  document.documentElement.setAttribute(
+    "data-theme",
+    window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+  );
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -713,10 +719,11 @@ class Component extends DCLogic {
   state = { copied: false, theme: "light" };
 
   componentDidMount() {
-    let t = null;
-    try { t = localStorage.getItem("burrete-theme"); } catch (e) {}
-    if (!t) t = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
-    this.setTheme(t, false);
+    this._colorScheme = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)");
+    this._onColorScheme = (event) => this.setTheme(event.matches ? "dark" : "light");
+    this.setTheme(this._colorScheme && this._colorScheme.matches ? "dark" : "light");
+    if (this._colorScheme) this._colorScheme.addEventListener("change", this._onColorScheme);
+    try { localStorage.removeItem("burrete-theme"); } catch (e) {}
     this.applyTweaks();
     this.reduced = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const safe = (fn) => { try { fn.call(this); } catch (e) { console.warn("init failed:", fn.name, e); } };
@@ -800,9 +807,10 @@ class Component extends DCLogic {
     r.setAttribute("data-corners", (this.props.corners || "Soft").toLowerCase());
   }
 
-  setTheme(theme, persist) {
+  setTheme(theme) {
     document.documentElement.setAttribute("data-theme", theme);
-    if (persist !== false) { try { localStorage.setItem("burrete-theme", theme); } catch (e) {} }
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (themeColor) themeColor.setAttribute("content", theme === "dark" ? "#0a0a0a" : "#ffffff");
     this.setState({ theme });
     if (this._particleColors) this._particleColors();
   }
@@ -1220,6 +1228,7 @@ class Component extends DCLogic {
     clearInterval(this._rotTimer); clearTimeout(this._typeTimer); clearTimeout(this._ct);
     clearInterval(this._rdkitPoll); clearInterval(this._vidTimer); clearInterval(this._tickPoll);
     clearTimeout(this._resizeRetry); if (this._ro) this._ro.disconnect();
+    if (this._colorScheme) this._colorScheme.removeEventListener("change", this._onColorScheme);
     if (this._onVis) { document.removeEventListener("visibilitychange", this._onVis); window.removeEventListener("focus", this._onVis); }
     if (this._lightboxClick) document.removeEventListener("click", this._lightboxClick);
     if (this._lightboxKey) document.removeEventListener("keydown", this._lightboxKey);
