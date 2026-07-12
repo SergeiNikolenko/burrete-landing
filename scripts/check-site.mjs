@@ -6,7 +6,8 @@ const contentRoot = path.join(root, "content");
 const failures = [];
 
 const contentFiles = await walk(contentRoot, (file) => file.endsWith(".mdx"));
-const sourceFiles = [path.join(root, "index.html"), ...contentFiles];
+const staticPages = [path.join(root, "index.html"), path.join(root, "demo.html")];
+const sourceFiles = [...staticPages, ...contentFiles];
 
 for (const file of sourceFiles) {
   const source = await readFile(file, "utf8");
@@ -26,10 +27,10 @@ for (const file of sourceFiles) {
   }
 
   for (const src of [...attributeValues(source, "src"), ...markdownImageSources(source)]) {
-    if (/^(?:data:|https?:|\/\/)/u.test(src)) continue;
+    if (src.includes("${") || /^(?:data:|https?:|\/\/)/u.test(src)) continue;
     const clean = src.split(/[?#]/u)[0];
     if (clean.startsWith("/_vercel/")) continue;
-    const target = file === path.join(root, "index.html")
+    const target = staticPages.includes(file)
       ? path.join(root, "public", clean.replace(/^\.\//u, "").replace(/^\//u, ""))
       : clean.startsWith("/assets/")
       ? path.join(root, "public", clean)
@@ -63,16 +64,20 @@ const navSource = landingSource.slice(
   landingSource.indexOf("<!-- ============ NAV ============ -->"),
   landingSource.indexOf("<!-- ============ HERO ============ -->"),
 );
-if (!navSource.includes('href="/out/github-repo?surface=nav"')) {
-  failures.push("index.html: primary navigation is missing the GitHub repository link");
+if (!navSource.includes('href="/demo"')) {
+  failures.push("index.html: primary navigation is missing the online demo link");
 }
 
 const heroSource = landingSource.slice(
   landingSource.indexOf("<!-- ============ HERO ============ -->"),
   landingSource.indexOf("<!-- ============ FORMATS ============ -->"),
 );
-if (!heroSource.includes('href="/out/github-repo?surface=hero"')) {
-  failures.push("index.html: hero is missing the GitHub repository link");
+if (!heroSource.includes('href="/demo"')) {
+  failures.push("index.html: hero is missing the online demo link");
+}
+
+if (!(await exists(path.join(root, "app", "demo", "route.js")))) {
+  failures.push("demo.html: missing /demo route");
 }
 
 if (failures.length > 0) {

@@ -211,8 +211,8 @@
   /* tilt cards */
   .tilt { transition: transform .4s cubic-bezier(.22,.61,.36,1), box-shadow .4s ease, border-color .3s ease; transform-style: preserve-3d; will-change: transform; }
   .tilt:hover { box-shadow: var(--shadow-card); }
-  .tilt img, .tilt video { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
-  .tilt:hover img, .tilt:hover video { transform: scale(1.05); }
+  .tilt img { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
+  .tilt:hover img { transform: scale(1.05); }
 
   /* zoomable */
   .zoomable { cursor: zoom-in; }
@@ -232,7 +232,7 @@
   @media (hover: none), (pointer: coarse) {
     .btn-ghost:hover, .fmt-chip:hover, .mq-chip:hover, .doc-card:hover, .src-link:hover, .hero-shot:hover { transform: none !important; }
     .tilt:hover { box-shadow: none !important; }
-    .tilt:hover img, .tilt:hover video { transform: none !important; }
+    .tilt:hover img { transform: none !important; }
   }
 
   /* lightbox */
@@ -243,10 +243,10 @@
   .mobile-docs { display: none; }
 
   /* tweaks: motion */
-  html[data-motion="calm"] .tilt:hover img, html[data-motion="calm"] .tilt:hover video { transform: scale(1.02); }
+  html[data-motion="calm"] .tilt:hover img { transform: scale(1.02); }
   html[data-motion="calm"] .reveal.in, html[data-motion="calm"] .word { animation-duration: 1.1s; }
   html[data-motion="lively"] .reveal.in, html[data-motion="lively"] .word { animation-duration: .5s; animation-timing-function: cubic-bezier(.34,1.56,.64,1); }
-  html[data-motion="lively"] .tilt:hover img, html[data-motion="lively"] .tilt:hover video { transform: scale(1.08); }
+  html[data-motion="lively"] .tilt:hover img { transform: scale(1.08); }
   html[data-motion="lively"] .fmt-chip:hover { transform: translateY(-6px); }
   /* tweaks: corners */
   html[data-corners="sharp"] .tilt, html[data-corners="sharp"] .src-link, html[data-corners="sharp"] .hero-shot { border-radius: 5px !important; }
@@ -291,7 +291,7 @@
         <a class="nav-link" href="#formats">Formats</a>
         <a class="nav-link" href="#codex">Codex + MCP</a>
         <a class="nav-link" href="#install">Install</a>
-        <a class="nav-link" href="/out/github-repo?surface=nav" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="nav" data-analytics-target="github-repo" style="font-weight: 600; color: var(--text);">GitHub ↗</a>
+        <a class="nav-link" href="/demo" data-analytics-event="Online Demo" data-analytics-location="nav" data-analytics-target="demo">Demo</a>
         <a class="nav-link" href="/docs" data-analytics-event="Docs Link" data-analytics-location="nav" data-analytics-target="docs-home">Docs</a>
       </div>
       <div style="display: flex; align-items: center; gap: 12px;">
@@ -319,11 +319,11 @@
       <p style="font-size: clamp(16px, 2vw, 19px); line-height: 1.55; color: var(--body); max-width: 630px; margin: 26px auto 0;">Press Space on PDB, CIF, SDF, XYZ, trajectories, or chemistry tables. Open Burrete when you need tabs, 3D inspection, RDKit grids, sketching, or export.</p>
       <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-top: 38px;">
         <a class="btn-primary magnetic" href="/download?source=hero" data-analytics-event="Download" data-analytics-location="hero" data-analytics-target="dmg" style="background: var(--invert-bg); color: var(--invert-fg); padding: 14px 26px; border-radius: 10px; font-size: 15px; font-weight: 500; display: inline-flex; align-items: center; gap: 9px;"><span class="shine"></span>Download for macOS</a>
-        <a class="btn-ghost" href="#install" style="display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--text); padding: 14px 20px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--nav);"><span style="color: var(--mono);">$</span> brew install --cask burrete</a>
-        <a class="btn-ghost" href="/out/github-repo?surface=hero" target="_blank" rel="noopener" data-analytics-event="Outbound Link" data-analytics-location="hero" data-analytics-target="github-repo" style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-2); background: var(--surface); padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text);">View on GitHub <span aria-hidden="true">↗</span></a>
+        <a class="btn-ghost" href="#install" style="display: inline-flex; align-items: center; gap: 12px; border: 1px solid var(--border-2); background: color-mix(in srgb, var(--surface) 82%, transparent); padding: 14px 20px; border-radius: 10px; font-family: 'Geist Mono', monospace; font-size: 14px; color: var(--nav);"><span style="color: var(--mono);">$</span> brew install --cask burrete</a>
+        <a class="btn-ghost" href="/demo" data-analytics-event="Online Demo" data-analytics-location="hero" data-analytics-target="demo" style="display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--border-2); background: var(--surface); padding: 14px 20px; border-radius: 10px; font-size: 14px; font-weight: 600; color: var(--text);">Try online</a>
       </div>
 
-      <div class="reveal hero-crop" style="margin: 56px auto 0; max-width: 1000px; border: 1px solid var(--border); border-bottom: none; border-radius: 14px 14px 0 0; overflow: hidden; box-shadow: var(--shadow-card); aspect-ratio: 1.9; -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent 100%); mask-image: linear-gradient(180deg, #000 82%, transparent 100%);">
+      <div class="reveal hero-crop" style="margin: 56px auto 0; max-width: 1000px; overflow: hidden; aspect-ratio: 1.9; -webkit-mask-image: linear-gradient(180deg, #000 82%, transparent 100%); mask-image: linear-gradient(180deg, #000 82%, transparent 100%);">
         <img class="hero-shot zoomable img-light" src="assets/main-light.png" alt="Burrete previewing 3HTB.pdb in the Mol* illustrative renderer" loading="eager" decoding="async" style="display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center;">
         <img class="hero-shot zoomable img-dark" src="assets/main-dark.png" alt="Burrete previewing 3HTB.pdb in the Mol* illustrative renderer" loading="eager" decoding="async" style="display: block; width: 100%; height: 100%; object-fit: cover; object-position: top center;">
       </div>
@@ -500,24 +500,14 @@
       </div>
     </div>
 
-    <div class="workflow-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px;">
-      <a class="doc-card reveal workflow-card" href="/docs/workflows/drag-and-drop" data-analytics-event="Docs Link" data-analytics-location="features" data-analytics-target="drag-and-drop" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: grid; grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); align-items: center;">
-        <div style="padding: 24px;">
-          <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">Target-aware drag &amp; drop</div>
-          <div style="font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px;">Drop by intent, not just by file type</div>
-          <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px;">Open together, append to a grid, import into Ketcher, or build a valid docking view from the target under the pointer.</p>
-          <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Drag guide <span class="doc-arrow">→</span></span>
-        </div>
-        <img src="assets/workflow-drag-drop.svg" loading="lazy" decoding="async" alt="Diagram of Burrete drag-and-drop sources, action resolver, and targets" style="width: 100%; height: 100%; min-height: 220px; object-fit: contain; object-position: center; background: var(--surface-2); border-left: 1px solid var(--border);">
-      </a>
-      <a class="doc-card reveal workflow-card" href="/docs/workflows/xtb" data-analytics-event="Docs Link" data-analytics-location="features" data-analytics-target="xtb-crest" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: grid; grid-template-columns: minmax(0, .9fr) minmax(220px, 1.1fr); align-items: center;">
+    <div class="workflow-grid" style="display: grid; grid-template-columns: 1fr; gap: 18px; margin-top: 18px;">
+      <a class="doc-card reveal workflow-card" href="/docs/workflows/xtb" data-analytics-event="Docs Link" data-analytics-location="features" data-analytics-target="xtb-crest" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden; background: var(--surface); display: block;">
         <div style="padding: 24px;">
           <div style="font-family: 'Geist Mono', monospace; font-size: 11px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--accent); margin-bottom: 9px;">Local calculations</div>
           <div style="font-size: 18px; font-weight: 600; color: var(--text); margin-bottom: 8px;">xTB properties and CREST ensembles</div>
           <p style="font-size: 13.5px; color: var(--muted); line-height: 1.55; margin: 0 0 12px;">Run installed executables as cancellable jobs with explicit settings, reports, logs, and reviewable artifacts.</p>
           <span style="font-family: 'Geist Mono', monospace; font-size: 12px; color: var(--accent);">Calculation guide <span class="doc-arrow">→</span></span>
         </div>
-        <img src="assets/workflow-xtb.svg" loading="lazy" decoding="async" alt="Diagram of Burrete's local xTB calculation workflow" style="width: 100%; height: 100%; min-height: 220px; object-fit: contain; object-position: center; background: var(--surface-2); border-left: 1px solid var(--border);">
       </a>
     </div>
   </div>
