@@ -35,15 +35,6 @@ The public domain is only the HTTPS host for `/mcp` and the widget's JavaScript 
 
 The hosted plugin is deployed for testing and prepared for review. Public one-click installation becomes available only after OpenAI approves the listing and the publisher releases it in the Plugins Directory.
 
-### Review demo
-
-The short review video shows both public tools, the interactive Burrete viewer inside ChatGPT, responsive mobile rendering, and the hosted data boundary:
-
-<video controls playsInline preload="metadata" style={{ width: '100%', borderRadius: '12px' }}>
-  <source src="/assets/burrete-chatgpt-plugin-demo.mp4" type="video/mp4" />
-  Your browser does not support the video element.
-</video>
-
 ### Hosted data boundary
 
 Attachments are fetched from the temporary HTTPS URL authorized by the OpenAI host, processed in memory, and limited to 3 MiB. The service does not save them to Burrete application storage. Raw molecular text is returned only to the sandboxed Burrete workspace through result metadata; the model receives a bounded summary.
