@@ -221,6 +221,8 @@
   .tilt:hover { box-shadow: var(--shadow-card); }
   .tilt img { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
   .tilt:hover img { transform: scale(1.05); }
+  .quicklook-media { position: relative; aspect-ratio: 1380 / 992; }
+  .quicklook-media img { position: absolute; width: 126.23%; max-width: none; left: -13.04%; top: -18.35%; }
 
   /* zoomable */
   .zoomable { cursor: zoom-in; }
@@ -406,7 +408,7 @@
         <h3 style="font-size: clamp(24px, 3vw, 32px); font-weight: 700; letter-spacing: -0.025em; margin: 0 0 14px; color: var(--text);">Inspect a structure before opening an app.</h3>
         <p style="font-size: 15.5px; line-height: 1.65; color: var(--body); margin: 0;">Finder previews open in interactive 3D: chains, residues, ligands, and surfaces are visible before you decide what to do with the file.</p>
       </div>
-      <div class="tilt showcase-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
+      <div class="tilt showcase-media quicklook-media" style="border: 1px solid var(--border); border-radius: 16px; overflow: hidden;">
         <img class="img-light zoomable" src="assets/prev-light.png" loading="lazy" decoding="async" alt="Burrete Quick Look preview floating on the desktop" style="width: 100%; display: block;">
         <img class="img-dark zoomable" src="assets/prev-dark.png" loading="lazy" decoding="async" alt="Burrete Quick Look preview floating on the desktop" style="width: 100%; display: block;">
       </div>
