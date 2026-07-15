@@ -221,8 +221,8 @@
   .tilt:hover { box-shadow: var(--shadow-card); }
   .tilt img { transition: transform .7s cubic-bezier(.22,.61,.36,1); }
   .tilt:hover img { transform: scale(1.05); }
-  .quicklook-media { position: relative; aspect-ratio: 1380 / 992; }
-  .quicklook-media img { position: absolute; width: 126.23%; max-width: none; left: -13.04%; top: -18.35%; }
+  .quicklook-media img { width: 100%; max-width: 100%; }
+  .tilt.quicklook-media:hover img { transform: none; }
 
   /* zoomable */
   .zoomable { cursor: zoom-in; }
