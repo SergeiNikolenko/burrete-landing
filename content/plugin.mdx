@@ -35,6 +35,22 @@ The public domain is only the HTTPS host for `/mcp` and the widget's JavaScript 
 
 The hosted plugin is deployed for testing and prepared for review. Public one-click installation becomes available only after OpenAI approves the listing and the publisher releases it in the Plugins Directory.
 
+### Demo recordings
+
+The desktop recording shows ChatGPT opening PDB 1CRN in the hosted Burrete widget and interacting with the molecular camera and representation controls.
+
+<video controls playsInline preload="metadata" style={{ width: "100%", borderRadius: 12 }}>
+  <source src="/assets/burrete-chatgpt-plugin-demo.mp4" type="video/mp4" />
+  Your browser does not support embedded MP4 video.
+</video>
+
+The physical iPhone recording shows the same public plugin opening PDB 1HTB and rendering the interactive molecular structure on mobile.
+
+<video controls playsInline preload="metadata" style={{ width: "min(100%, 420px)", borderRadius: 12 }}>
+  <source src="/assets/burrete-chatgpt-plugin-demo-iphone.mp4" type="video/mp4" />
+  Your browser does not support embedded MP4 video.
+</video>
+
 ### Hosted data boundary
 
 Attachments are fetched from the temporary HTTPS URL authorized by the OpenAI host, processed in memory, and limited to 3 MiB. The service does not save them to Burrete application storage. Raw molecular text is returned only to the sandboxed Burrete workspace through result metadata; the model receives a bounded summary.
