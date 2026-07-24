@@ -1,25 +1,25 @@
 ---
-title: Install Burrete
-description: Install Burrete with Homebrew, the Bun CLI, or GitHub Releases, and optionally connect it to Codex through the local MCP plugin.
+title: Install Burette
+description: Install Burette with Homebrew, the Bun CLI, or GitHub Releases, and optionally connect it to Codex through the local MCP plugin.
 ---
 
-# Install Burrete
+# Install Burette
 
-Burrete supports macOS 12 and later.
+Burette supports macOS 12 and later.
 
 ## Homebrew
 
-Install from the Burrete tap:
+Install from the Burette tap:
 
 ```bash
-brew tap SergeiNikolenko/burrete
-brew install --cask burrete
+brew tap SergeiNikolenko/burette
+brew install --cask burette
 ```
 
 Check the installed cask version:
 
 ```bash
-brew info --cask SergeiNikolenko/burrete/burrete
+brew info --cask SergeiNikolenko/burette/burette
 ```
 
 ## Bun CLI
@@ -27,50 +27,50 @@ brew info --cask SergeiNikolenko/burrete/burrete
 Use the CLI when you want the latest stable GitHub release or a quick health check:
 
 ```bash
-bunx burrete latest
-bunx burrete install
-bunx burrete doctor
+bunx burette latest
+bunx burette install
+bunx burette doctor
 ```
 
-The Bun installer places Burrete in `~/Applications` by default. Use `bunx burrete install --system` only when you intentionally want the app in `/Applications` for all users.
+The Bun installer places Burette in `~/Applications` by default. Use `bunx burette install --system` only when you intentionally want the app in `/Applications` for all users.
 
 ## GitHub Releases
 
 You can also install manually:
 
-1. Open the [latest release](https://github.com/SergeiNikolenko/Burrete/releases/latest).
-2. Download the `Burrete-<version>.zip` file.
+1. Open the [latest release](https://github.com/SergeiNikolenko/Burette/releases/latest).
+2. Download the `Burette-<version>.zip` file.
 3. Unzip it.
-4. Move `Burrete.app` to your `Applications` folder.
-5. Open Burrete once from `Applications`.
+4. Move `Burette.app` to your `Applications` folder.
+5. Open Burette once from `Applications`.
 
 ## First launch
 
-Open `Burrete.app` once after installation. This gives macOS a chance to register the app bundle and Finder Quick Look extension.
+Open `Burette.app` once after installation. This gives macOS a chance to register the app bundle and Finder Quick Look extension.
 
 If Finder previews do not appear after install, run:
 
 ```bash
-bunx burrete doctor
+bunx burette doctor
 ```
 
 ## Codex plugin and local MCP
 
-The optional Codex integration lives in the same [Burrete repository](https://github.com/SergeiNikolenko/Burrete) as the app. It bundles workflow skills with typed MCP tools for opening, observing, and controlling a local molecular workspace.
+The optional Codex integration lives in the same [Burette repository](https://github.com/SergeiNikolenko/Burette) as the app. It bundles workflow skills with typed MCP tools for opening, observing, and controlling a local molecular workspace.
 
 Clone the repository and run the plugin installer:
 
 ```bash
-git clone https://github.com/SergeiNikolenko/Burrete.git
-cd Burrete
+git clone https://github.com/SergeiNikolenko/Burette.git
+cd Burette
 bun run install:plugin
 ```
 
-Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. See [Codex Plugin and MCP](/docs/plugin) for the tool surface, security boundaries, and source links.
+Restart Codex after installation, then mention `@Burette` or select Burette from Plugins. See [Codex Plugin and MCP](/docs/plugin) for the tool surface, security boundaries, and source links.
 
 ## Optional local calculation engines
 
-The Burrete application does not bundle xTB, CREST, or PRISM. Install only the engines needed for your local workflow:
+The Burette application does not bundle xTB, CREST, or PRISM. Install only the engines needed for your local workflow:
 
 ```bash
 pixi global install xtb

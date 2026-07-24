@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
-  <title id="title">Burrete target-aware drag-and-drop workflow</title>
+  <title id="title">Burette target-aware drag-and-drop workflow</title>
   <desc id="desc">Files, records, tabs, sketches, and clipboard text pass through a target-aware action resolver and enter the workspace, collection grid, Ketcher, Molstar docking view, xyzrender sheet, or FEP setup.</desc>
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fbfa"/><stop offset="1" stop-color="#eef7f4"/></linearGradient>
@@ -10,7 +10,7 @@
   </defs>
   <rect width="1200" height="620" rx="28" fill="url(#bg)"/>
   <text x="60" y="66" class="title">Drop the same molecule; choose by destination</text>
-  <text x="60" y="98" class="sub">Burrete carries paths, structure records, and source context instead of treating every drop as “open file”.</text>
+  <text x="60" y="98" class="sub">Burette carries paths, structure records, and source context instead of treating every drop as “open file”.</text>
 
   <text x="75" y="150" class="label">Sources</text>
   <g transform="translate(60 172)">

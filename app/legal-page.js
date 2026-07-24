@@ -1,4 +1,4 @@
-const SITE_URL = "https://burrete-landing.vercel.app";
+const SITE_URL = "https://burette-landing.vercel.app";
 
 export function legalPage({ path, title, description, body }) {
   return `<!DOCTYPE html>
@@ -6,14 +6,14 @@ export function legalPage({ path, title, description, body }) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>${title} | Burrete</title>
+<title>${title} | Burette</title>
 <meta name="description" content="${description}">
 <meta name="author" content="Sergei A. Nikolenko">
 <link rel="canonical" href="${SITE_URL}${path}">
-<meta property="og:title" content="${title} | Burrete">
+<meta property="og:title" content="${title} | Burette">
 <meta property="og:description" content="${description}">
 <meta property="og:type" content="website">
-<meta property="og:image" content="${SITE_URL}/assets/burrete-quicklook.png">
+<meta property="og:image" content="${SITE_URL}/assets/burette-quicklook.png">
 <meta name="theme-color" content="#0a0a0a">
 <style>
   * { box-sizing: border-box; }
@@ -40,13 +40,13 @@ export function legalPage({ path, title, description, body }) {
 </style>
 </head>
 <body>
-<header><nav><a href="/"><strong>Burrete</strong></a><a href="/docs">Documentation</a></nav></header>
+<header><nav><a href="/"><strong>Burette</strong></a><a href="/docs">Documentation</a></nav></header>
 <main>
   <h1>${title}</h1>
   <p class="effective">Effective date: July 10, 2026</p>
   ${body}
 </main>
-<footer><div><span>Published by Sergei A. Nikolenko under the MIT License.</span><span><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burrete">GitHub</a></span></div></footer>
+<footer><div><span>Published by Sergei A. Nikolenko under the MIT License.</span><span><a href="/support">Support</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a><a href="https://github.com/SergeiNikolenko/Burette">GitHub</a></span></div></footer>
 </body>
 </html>`;
 }

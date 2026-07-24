@@ -1,15 +1,15 @@
 ---
 title: SDF and Molecule Collections
-description: Search, sort, select, edit, merge, and export SDF, SMILES, CSV, and TSV molecule collections in Burrete.
+description: Search, sort, select, edit, merge, and export SDF, SMILES, CSV, and TSV molecule collections in Burette.
 ---
 
 # SDF and Molecule Collections
 
-Burrete opens molecular libraries in an RDKit-backed grid. The collection surface supports SDF/SD, SMI/SMILES, CSV, and TSV; an SDF can also be opened as a single 3D structure when that is the more useful view.
+Burette opens molecular libraries in an RDKit-backed grid. The collection surface supports SDF/SD, SMI/SMILES, CSV, and TSV; an SDF can also be opened as a single 3D structure when that is the more useful view.
 
-![Burrete showing a searchable molecule collection with structure cards, table columns, and grid controls.](/assets/grid-table-light.png)
+![Burette showing a searchable molecule collection with structure cards, table columns, and grid controls.](/assets/grid-table-light.png)
 
-*The checked-in Burrete screenshot shows the real collection surface. Controls vary with the source format and available local renderers.*
+*The checked-in Burette screenshot shows the real collection surface. Controls vary with the source format and available local renderers.*
 
 ## Find and inspect molecules
 
@@ -53,7 +53,7 @@ Merge is intentionally strict:
 - CSV files merge only with CSV, and every file must use the same header names in the same order.
 - TSV files merge only with TSV using the same strict header rule.
 - Mixing SDF, SMILES, CSV, and TSV families is rejected rather than guessed.
-- A payload containing an unsupported file is rejected as a whole; Burrete does not silently drop the unsupported source from a partial merge.
+- A payload containing an unsupported file is rejected as a whole; Burette does not silently drop the unsupported source from a partial merge.
 
 The merged document is created as a reviewable collection with a suggested name such as `merged-collection.sdf`. Save it explicitly when you want a persistent file.
 

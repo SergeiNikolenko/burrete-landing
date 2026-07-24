@@ -1,11 +1,11 @@
 ---
 title: Engines
-description: Understand how Burrete routes previews to Mol*, RDKit grids, and external xyzrender.
+description: Understand how Burette routes previews to Mol*, RDKit grids, and external xyzrender.
 ---
 
 # Engines
 
-Burrete uses several preview paths. The route depends on the file type and the runtime surface.
+Burette uses several preview paths. The route depends on the file type and the runtime surface.
 
 ## Mol*
 
@@ -23,9 +23,9 @@ Use the grid when you need search, sorting, SMARTS filtering and highlighting, r
 
 `xyzrender` is an optional local executable used for artwork-style SVG rendering and format-specific fallback previews.
 
-XYZ and several quantum-chemistry inputs can use `xyzrender` when the active renderer policy selects it. Burrete also has coordinate-conversion paths for ABI, COM, CUB/CUBE, FDF, FHIAIMS, GMS, IN/INP, LOG, NW/OUT, PSI4, QCIN, VASP, and XYZR, and a separate Maestro conversion path for MAE/MAEGZ/CMS. If conversion cannot produce coordinates, the external renderer remains the fallback rather than a silently fabricated structure.
+XYZ and several quantum-chemistry inputs can use `xyzrender` when the active renderer policy selects it. Burette also has coordinate-conversion paths for ABI, COM, CUB/CUBE, FDF, FHIAIMS, GMS, IN/INP, LOG, NW/OUT, PSI4, QCIN, VASP, and XYZR, and a separate Maestro conversion path for MAE/MAEGZ/CMS. If conversion cannot produce coordinates, the external renderer remains the fallback rather than a silently fabricated structure.
 
-Multi-frame XYZ files stay in Mol* when Burrete detects trajectory content so the native trajectory controls can show the available frames.
+Multi-frame XYZ files stay in Mol* when Burette detects trajectory content so the native trajectory controls can show the available frames.
 
 ## VESTA handoff
 
@@ -33,7 +33,7 @@ CUBE, CIF, MMCIF, MCIF, XYZ, and external-renderer input previews expose an opti
 
 ## Calculation engines are separate
 
-xTB, CREST, and PRISM are local calculation executables, not preview renderers. Burrete prepares bounded inputs, runs cancellable jobs, and opens reports and artifacts, while Mol*, RDKit, or the text viewer display their outputs.
+xTB, CREST, and PRISM are local calculation executables, not preview renderers. Burette prepares bounded inputs, runs cancellable jobs, and opens reports and artifacts, while Mol*, RDKit, or the text viewer display their outputs.
 
 - [xTB calculations](/docs/workflows/xtb)
 - [CREST and PRISM](/docs/workflows/crest-prism)

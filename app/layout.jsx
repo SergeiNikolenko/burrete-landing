@@ -6,19 +6,19 @@ import "nextra-theme-docs/style.css";
 export const metadata = {
   authors: [{ name: "Sergei A. Nikolenko" }],
   title: {
-    default: "Burrete Docs",
-    template: "%s | Burrete Docs",
+    default: "Burette Docs",
+    template: "%s | Burette Docs",
   },
   description:
-    "Documentation for Burrete across macOS, Finder Quick Look, iPhone, the public molecular plugin, and typed MCP tools.",
+    "Documentation for Burette across macOS, Finder Quick Look, iPhone, the public molecular plugin, and typed MCP tools.",
 };
 
 export default async function RootLayout({ children }) {
   const navbar = (
     <Navbar
-      logo={<strong>Burrete Docs</strong>}
+      logo={<strong>Burette Docs</strong>}
       logoLink="/docs"
-      projectLink="https://github.com/SergeiNikolenko/Burrete"
+      projectLink="https://github.com/SergeiNikolenko/Burette"
     />
   );
 
@@ -29,7 +29,7 @@ export default async function RootLayout({ children }) {
         <Layout
           navbar={navbar}
           pageMap={await getPageMap("/docs")}
-          docsRepositoryBase="https://github.com/SergeiNikolenko/burrete-landing/tree/main"
+          docsRepositoryBase="https://github.com/SergeiNikolenko/burette-landing/tree/main"
           editLink="Edit this page on GitHub"
           feedback={{
             content: "Report a docs issue",

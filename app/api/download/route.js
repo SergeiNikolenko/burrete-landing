@@ -1,5 +1,5 @@
 const OWNER = "SergeiNikolenko";
-const REPO = "Burrete";
+const REPO = "Burette";
 const RELEASES_URL = `https://github.com/${OWNER}/${REPO}/releases`;
 const LATEST_RELEASE_URL = `https://api.github.com/repos/${OWNER}/${REPO}/releases/latest`;
 
@@ -29,7 +29,7 @@ async function redirectToLatestDmg() {
     const response = await fetch(LATEST_RELEASE_URL, {
       headers: {
         Accept: "application/vnd.github+json",
-        "User-Agent": "burrete-landing-download-redirect",
+        "User-Agent": "burette-landing-download-redirect",
       },
       cache: "no-store",
     });
@@ -53,8 +53,8 @@ async function redirectToLatestDmg() {
     }
 
     return redirect(dmg.browser_download_url, {
-      ...(release.tag_name ? { "X-Burrete-Release": release.tag_name } : {}),
-      "X-Burrete-Asset": dmg.name,
+      ...(release.tag_name ? { "X-Burette-Release": release.tag_name } : {}),
+      "X-Burette-Asset": dmg.name,
     });
   } catch {
     return redirect(RELEASES_URL);

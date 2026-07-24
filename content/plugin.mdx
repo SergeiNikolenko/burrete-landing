@@ -1,23 +1,23 @@
 ---
-title: Burrete Plugin and MCP
-description: Use the public Burrete molecular workspace through its hosted MCP endpoint, or install the local Codex plugin for desktop control.
+title: Burette Plugin and MCP
+description: Use the public Burette molecular workspace through its hosted MCP endpoint, or install the local Codex plugin for desktop control.
 ---
 
-# Burrete Plugin and MCP
+# Burette Plugin and MCP
 
-Burrete has two complementary plugin surfaces:
+Burette has two complementary plugin surfaces:
 
-- A public hosted plugin that opens supported molecular results directly in the real Burrete browser workspace.
-- A local Codex plugin that can open local files and control Burrete desktop or Browser sessions.
+- A public hosted plugin that opens supported molecular results directly in the real Burette browser workspace.
+- A local Codex plugin that can open local files and control Burette desktop or Browser sessions.
 
-Both implementations live in the [main Burrete repository](https://github.com/SergeiNikolenko/Burrete). There is no separate plugin source repository.
+Both implementations live in the [main Burette repository](https://github.com/SergeiNikolenko/Burette). There is no separate plugin source repository.
 
 ## Public hosted plugin
 
 The production MCP endpoint is:
 
 ```text
-https://burrete-plugin.vercel.app/mcp
+https://burette-plugin.vercel.app/mcp
 ```
 
 It exposes two read-only tools:
@@ -29,31 +29,31 @@ preview_pdb_structure
 
 `preview_molecular_file` accepts one ChatGPT-authorized PDB, ENT, PDBQT, CIF, mmCIF, SDF, SD, XYZ, or extended XYZ attachment. `preview_pdb_structure` retrieves one public RCSB Protein Data Bank entry by its four-character PDB ID.
 
-Each result returns bounded composition data and opens directly in the real Burrete workspace with its document tab, viewer toolbar, sequence and selection controls, measurements, representations, camera controls, and molecular inspector. The deployment root redirects back to this documentation; it is not a separate viewer product.
+Each result returns bounded composition data and opens directly in the real Burette workspace with its document tab, viewer toolbar, sequence and selection controls, measurements, representations, camera controls, and molecular inspector. The deployment root redirects back to this documentation; it is not a separate viewer product.
 
-The public domain is only the HTTPS host for `/mcp` and the widget's JavaScript and CSS. After the MCP server returns a tool result and UI template, ChatGPT renders the Burrete component inside an isolated iframe on the user's device, where WebGL and Mol* use that device's CPU and GPU. State belongs to that chat widget; there is no shared protein or shared Burrete workspace between users.
+The public domain is only the HTTPS host for `/mcp` and the widget's JavaScript and CSS. After the MCP server returns a tool result and UI template, ChatGPT renders the Burette component inside an isolated iframe on the user's device, where WebGL and Mol* use that device's CPU and GPU. State belongs to that chat widget; there is no shared protein or shared Burette workspace between users.
 
 The hosted plugin is deployed for testing and prepared for review. Public one-click installation becomes available only after OpenAI approves the listing and the publisher releases it in the Plugins Directory.
 
 ### Demo recordings
 
-The desktop recording shows ChatGPT opening PDB 1CRN in the hosted Burrete widget and interacting with the molecular camera and representation controls.
+The desktop recording shows ChatGPT opening PDB 1CRN in the hosted Burette widget and interacting with the molecular camera and representation controls.
 
 <video controls playsInline preload="metadata" style={{ width: "100%", borderRadius: 12 }}>
-  <source src="/assets/burrete-chatgpt-plugin-demo.mp4" type="video/mp4" />
+  <source src="/assets/burette-chatgpt-plugin-demo.mp4" type="video/mp4" />
   Your browser does not support embedded MP4 video.
 </video>
 
 The physical iPhone recording shows the same public plugin opening PDB 1HTB and rendering the interactive molecular structure on mobile.
 
 <video controls playsInline preload="metadata" style={{ width: "min(100%, 420px)", borderRadius: 12 }}>
-  <source src="/assets/burrete-chatgpt-plugin-demo-iphone.mp4" type="video/mp4" />
+  <source src="/assets/burette-chatgpt-plugin-demo-iphone.mp4" type="video/mp4" />
   Your browser does not support embedded MP4 video.
 </video>
 
 ### Hosted data boundary
 
-Attachments are fetched from the temporary HTTPS URL authorized by the OpenAI host, processed in memory, and limited to 3 MiB. The service does not save them to Burrete application storage. Raw molecular text is returned only to the sandboxed Burrete workspace through result metadata; the model receives a bounded summary.
+Attachments are fetched from the temporary HTTPS URL authorized by the OpenAI host, processed in memory, and limited to 3 MiB. The service does not save them to Burette application storage. Raw molecular text is returned only to the sandboxed Burette workspace through result metadata; the model receives a bounded summary.
 
 Do not send credentials, protected health information, export-controlled structures, or confidential molecular files unless your OpenAI workspace policy and organization explicitly permit that processing. See the [Privacy Policy](/privacy) for recipients, retention, and user controls.
 
@@ -61,7 +61,7 @@ Do not send credentials, protected health information, export-controlled structu
 
 The local plugin connects Codex to the same molecular workspace used by the macOS app. It combines focused workflow skills with a typed local stdio MCP server.
 
-This is the preferred path for local-first work on the same Mac: the plugin can open local files and control the installed Burrete app without routing that workspace through the public hosted service.
+This is the preferred path for local-first work on the same Mac: the plugin can open local files and control the installed Burette app without routing that workspace through the public hosted service.
 
 ### What local Codex can do
 
@@ -74,26 +74,26 @@ This is the preferred path for local-first work on the same Mac: the plugin can 
 The short MCP facade is:
 
 ```text
-burrete.get_context
-burrete.open_workspace
-burrete.observe_workspace
-burrete.control_viewer
-burrete.render_panel
+burette.get_context
+burette.open_workspace
+burette.observe_workspace
+burette.control_viewer
+burette.render_panel
 ```
 
-`burrete.open_workspace` returns a stable `workspaceSessionId`. Follow-up calls use that handle instead of carrying raw URLs or session-directory details through the conversation.
+`burette.open_workspace` returns a stable `workspaceSessionId`. Follow-up calls use that handle instead of carrying raw URLs or session-directory details through the conversation.
 
 ### Install the local plugin
 
 Clone the main repository and run its plugin installer:
 
 ```bash
-git clone https://github.com/SergeiNikolenko/Burrete.git
-cd Burrete
+git clone https://github.com/SergeiNikolenko/Burette.git
+cd Burette
 bun run install:plugin
 ```
 
-Restart Codex after installation, then mention `@Burrete` or select Burrete from Plugins. The installer stages the self-contained plugin in a dedicated local marketplace, registers that marketplace with Codex, and enables `burrete@burrete` through the Codex CLI. The MCP server is bundled, so the installed plugin does not depend on a separate `node_modules` directory.
+Restart Codex after installation, then mention `@Burette` or select Burette from Plugins. The installer stages the self-contained plugin in a dedicated local marketplace, registers that marketplace with Codex, and enables `burette@burette` through the Codex CLI. The MCP server is bundled, so the installed plugin does not depend on a separate `node_modules` directory.
 
 ### Why the workspace bridge stays local
 
@@ -105,10 +105,10 @@ Browser development, the desktop app, tokenized preview, native Quick Look, and 
 
 ## Source and contracts
 
-- [Burrete repository](https://github.com/SergeiNikolenko/Burrete)
-- [Hosted plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/apps/burrete-public-plugin)
-- [Codex plugin source](https://github.com/SergeiNikolenko/Burrete/tree/main/plugins/burette-agent)
-- [Plugin installation and architecture](https://github.com/SergeiNikolenko/Burrete/blob/main/plugins/burette-agent/README.md)
-- [Agent platform and MCP contract](https://github.com/SergeiNikolenko/Burrete/blob/main/docs/agent-platform.md)
-- [Privacy notice](https://github.com/SergeiNikolenko/Burrete/blob/main/PRIVACY.md)
-- [Terms](https://github.com/SergeiNikolenko/Burrete/blob/main/TERMS.md)
+- [Burette repository](https://github.com/SergeiNikolenko/Burette)
+- [Hosted plugin source](https://github.com/SergeiNikolenko/Burette/tree/main/apps/burette-public-plugin)
+- [Codex plugin source](https://github.com/SergeiNikolenko/Burette/tree/main/plugins/burette-agent)
+- [Plugin installation and architecture](https://github.com/SergeiNikolenko/Burette/blob/main/plugins/burette-agent/README.md)
+- [Agent platform and MCP contract](https://github.com/SergeiNikolenko/Burette/blob/main/docs/agent-platform.md)
+- [Privacy notice](https://github.com/SergeiNikolenko/Burette/blob/main/PRIVACY.md)
+- [Terms](https://github.com/SergeiNikolenko/Burette/blob/main/TERMS.md)
