@@ -1,5 +1,5 @@
 {
-  "name": "burrete-landing",
+  "name": "burette-landing",
   "private": true,
   "scripts": {
     "dev": "next dev",

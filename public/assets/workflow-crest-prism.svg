@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 560" role="img" aria-labelledby="title desc">
   <title id="title">CREST conformer generation and optional PRISM pruning</title>
-  <desc id="desc">A small molecule or selected object runs through CREST to generate an ensemble. Burrete reviews the output and may send an existing XYZ or SDF ensemble to optional PRISM pruning. xTB pre-optimization is a recovery path.</desc>
+  <desc id="desc">A small molecule or selected object runs through CREST to generate an ensemble. Burette reviews the output and may send an existing XYZ or SDF ensemble to optional PRISM pruning. xTB pre-optimization is a recovery path.</desc>
   <defs>
     <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto"><path d="M0 0l10 5-10 5z" fill="#0f8f72"/></marker>
     <linearGradient id="bg" x1="0" x2="1"><stop stop-color="#f8fbfa"/><stop offset="1" stop-color="#edf7f3"/></linearGradient>

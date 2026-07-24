@@ -1,7 +1,7 @@
 const ROBOTS = `User-agent: *
 Allow: /
 
-Sitemap: https://burrete-landing.vercel.app/sitemap.xml
+Sitemap: https://burette-landing.vercel.app/sitemap.xml
 `;
 
 export const dynamic = "force-static";

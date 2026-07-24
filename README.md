@@ -1,9 +1,9 @@
-# Burrete Landing
+# Burette Landing
 
-Static landing page for Burrete, the molecular file workspace for macOS.
+Static landing page for Burette, the molecular file workspace for macOS.
 
 The `/download` route records a lightweight Web Analytics page view, then
-redirects to the `.dmg` asset from the latest `SergeiNikolenko/Burrete`
+redirects to the `.dmg` asset from the latest `SergeiNikolenko/Burette`
 GitHub release through `/api/download`.
 
 Outbound links use `/out/:target` so clicks to GitHub, docs, releases, and

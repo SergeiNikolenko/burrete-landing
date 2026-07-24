@@ -6,6 +6,6 @@ export default {
   engines: "Engines",
   formats: "Formats",
   troubleshooting: "Troubleshooting",
-  plugin: "Burrete Plugin & MCP",
+  plugin: "Burette Plugin & MCP",
   development: "Development",
 };

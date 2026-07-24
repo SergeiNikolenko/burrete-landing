@@ -1,4 +1,4 @@
-const SITE_URL = "https://burrete-landing.vercel.app";
+const SITE_URL = "https://burette-landing.vercel.app";
 
 const URLS = [
   { path: "", priority: "1.0", changefreq: "weekly" },
